@@ -32,14 +32,13 @@ jobs:
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
         pip list
+    - name: Test numpy
+      run: |
+        python -c "import numpy as np; print(np.core.numeric.dtype); print(np.iinfo(np.int64).max)"
     - name: Build Pandas
       run: |
         python setup.py build_ext -q -j2
         python -m pip install -e . --no-build-isolation --no-use-pep517
-
-    - name: Test numpy
-      run: |
-        python -c "import numpy; print(np.core.numeric.dtype);"
 
     - name: Build Version
       run: |
