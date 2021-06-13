@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install --extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple --pre numpy
+        pip install --index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple --pre numpy
         pip install git+https://github.com/pytest-dev/pytest.git
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
@@ -42,7 +42,7 @@ jobs:
         python -c "import pandas; pandas.show_versions();"
     - name: Test with pytest
       run: |
-        coverage run -m pytest -m 'not slow and not network and not clipboard' pandas/tests/reductions pandas/tests/resample
+        coverage run -m pytest -m 'not slow and not network and not clipboard' pandas
       continue-on-error: true
 
     - name: Publish test results
