@@ -32,6 +32,7 @@ jobs:
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
         pip list
+        python -c "import numpy; numpy.iinfo(numpy.int64).max;"
 
     - name: Build Pandas
       run: |
@@ -41,10 +42,9 @@ jobs:
     - name: Build Version
       run: |
         python -c "import pandas; pandas.show_versions();"
-
     - name: Test with pytest
       run: |
-        coverage run -m pytest -m 'not slow and not network and not clipboard' pandas/tests/reductions
+        coverage run -m pytest -m 'not slow and not network and not clipboard' pandas/tests/reductions pandas/tests/resample
       continue-on-error: true
 
     - name: Publish test results
