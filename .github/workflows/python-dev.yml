@@ -43,6 +43,7 @@ jobs:
         python -c "import pandas; pandas.show_versions();"
     - name: Ensure numpy tests pass
       run: |
+        cd ..
         python -c "import numpy; numpy.test();"
 
     - name: Test with pytest
