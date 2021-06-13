@@ -27,7 +27,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip setuptools wheel
-        pip install git+https://github.com/numpy/numpy.git@dae36b3d26724fdaa5d17656d79e9daf68517321
+        pip install git+https://github.com/numpy/numpy.git@b3a2f97e217897f692de3db5f1ed675a0da79fd4
         pip install git+https://github.com/pytest-dev/pytest.git
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
@@ -36,6 +36,10 @@ jobs:
       run: |
         python setup.py build_ext -q -j2
         python -m pip install -e . --no-build-isolation --no-use-pep517
+
+    - name: Test numpy
+      run: |
+        python -c "import numpy; print(np.core.numeric.dtype);"
 
     - name: Build Version
       run: |
