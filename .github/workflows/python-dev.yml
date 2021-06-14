@@ -32,10 +32,6 @@ jobs:
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
         pip list
-    - name: Test numpy/pandas
-      run: |
-        python -c "import numpy as np; print(np.core.numeric.dtype); print(np.iinfo(np.int64).max)"
-        python -c "import pandas as pd; i = pd.Index([1,2,3]); i.max(); i.min()"
     - name: Build Pandas
       run: |
         python setup.py build_ext -q -j2
@@ -44,6 +40,10 @@ jobs:
     - name: Build Version
       run: |
         python -c "import pandas; pandas.show_versions();"
+    - name: Test numpy/pandas
+      run: |
+        python -c "import numpy as np; print(np.core.numeric.dtype); print(np.iinfo(np.int64).max)"
+        python -c "import pandas as pd; i = pd.Index([1,2,3]); i.max(); i.min()"
     - name: Test with pytest
       run: |
         coverage run -m pytest -m 'not slow and not network and not clipboard' pandas -n auto
