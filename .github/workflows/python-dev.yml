@@ -28,7 +28,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip setuptools wheel
         pip install git+https://github.com/numpy/numpy.git@7a181643665a1a71cb720baecf3713767650a64f
-        pip install git+https://github.com/pytest-dev/pytest.git
+        pip install git+https://github.com/pytest-dev/pytest.git@992eabc29efaaddb8919cf254b948b2fcc5fb514
         pip install git+https://github.com/nedbat/coveragepy.git
         pip install cython python-dateutil pytz hypothesis pytest-xdist
         pip list
