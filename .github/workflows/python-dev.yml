@@ -44,11 +44,11 @@ jobs:
       run: |
         python -c "import numpy as np; print(np.core.numeric.dtype); print(np.iinfo(np.int64).max)"
         python -c "import numpy as np; print(np.core.numeric.dtype(np.int64))"
-        python -c "import numpy as np; print(np.core.numeric.dtype(type(np.int64))"
+        python -c "import numpy as np; print(np.core.numeric.dtype(type(np.int64)))"
         python -c "import pandas as pd; i = pd.Index([1,2,3]); print(i.max()); print(i.min())"
     - name: Test with pytest
       run: |
-        pytest -m 'not slow and not network and not clipboard' pandas -n auto
+        pytest -m 'not slow and not network and not clipboard' pandas/tests/reductions -n auto
       continue-on-error: true
 
 #    - name: Publish test results
