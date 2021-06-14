@@ -43,7 +43,8 @@ jobs:
     - name: Test numpy/pandas
       run: |
         python -c "import numpy as np; print(np.core.numeric.dtype); print(np.iinfo(np.int64).max)"
-        python -c "import numpy as np; print(np.core.numeric.dtype(np.int64).max)"
+        python -c "import numpy as np; print(np.core.numeric.dtype(np.int64))"
+        python -c "import numpy as np; print(np.core.numeric.dtype(type(np.int64))"
         python -c "import pandas as pd; i = pd.Index([1,2,3]); print(i.max()); print(i.min())"
     - name: Test with pytest
       run: |
