@@ -48,7 +48,7 @@ jobs:
         python -c "import pandas as pd; i = pd.Index([1,2,3]); print(i.max()); print(i.min())"
     - name: Test with pytest
       run: |
-        pytest -m 'not slow and not network and not clipboard' pandas/tests/reductions -n auto
+        pytest -m 'not slow and not network and not clipboard' pandas/tests -n auto
       continue-on-error: true
 
 #    - name: Publish test results
