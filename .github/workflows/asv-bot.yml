@@ -9,6 +9,9 @@ on:
     types:
       - created
 
+env:
+  ENV_FILE: environment.yml
+
 jobs:
   autotune:
     name: "Run benchmarks"
