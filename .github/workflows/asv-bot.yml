@@ -1,6 +1,10 @@
 name: "ASV Bot"
 
 on:
+  # TODO: remove this, testing purposes only
+  pull_request:
+    branches:
+      - master
   issue_comment: # Pull requests are issues
     types:
       - created
