@@ -49,5 +49,5 @@ jobs:
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
-          asv continuous -e -E existing -f 1.1 upstream/master HEAD | tee benchmarks.log
+          asv continuous -f 1.1 upstream/master HEAD | tee benchmarks.log
           
