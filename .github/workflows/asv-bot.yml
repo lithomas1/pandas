@@ -18,7 +18,10 @@ jobs:
     # TODO: Support more benchmarking options later, against different branches, against self, etc
     #if: startsWith(github.event.comment.body, '@github-actions benchmark')
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        shell: bash -l {0}
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v2
