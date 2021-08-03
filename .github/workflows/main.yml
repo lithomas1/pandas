@@ -1,0 +1,41 @@
+name: "ASV Bot"
+
+on:
+  issue_comment: # Pull requests are issues
+    types:
+      - created
+
+jobs:
+  autotune:
+    name: "Run benchmarks"
+    # TODO: Support more benchmarking options later, against different branches, against self, etc
+    if: startsWith(github.event.comment.body, '@github-actions benchmark')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
+
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: pandas-dev
+          channel-priority: strict
+          environment-file: ${{ env.ENV_FILE }}
+          use-only-tar-bz2: true
+
+      - name: Run benchmarks
+        run: |
+          asv check -E existing
+          git remote add upstream https://github.com/pandas-dev/pandas.git
+          git fetch upstream
+          asv machine --yes
+          asv continuous -e -E existing -f 1.1 upstream/master HEAD | tee benchmarks.log
+          
