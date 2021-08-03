@@ -37,10 +37,11 @@ jobs:
           channel-priority: strict
           environment-file: ${{ env.ENV_FILE }}
           use-only-tar-bz2: true
-      - name: Build Pandas
-        uses: ./.github/actions/build_pandas
+#       - name: Build Pandas
+#         uses: ./.github/actions/build_pandas
       - name: Run benchmarks
         run: |
+          cd asv_bench
           asv check -E existing
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
