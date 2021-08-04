@@ -54,7 +54,7 @@ jobs:
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: contexft.repo.repo,
+              repo: context.repo.repo,
               body: `${BENCH_OUTPUT}`
             })
           
