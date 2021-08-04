@@ -27,19 +27,11 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
-      - name: Cache conda
-        uses: actions/cache@v2
-        with:
-          path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
-
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: pandas-dev
-          channel-priority: strict
-          environment-file: ${{ env.ENV_FILE }}
-          use-only-tar-bz2: true
+        
+        # Don't install the full conda environment, asv will do that by itself
+      - name: Install ASV
+        run: |
+          pip install asv
 
       - name: Run benchmarks
         run: |
@@ -49,7 +41,7 @@ jobs:
           git fetch upstream
           asv machine --yes
           asv continuous -f 1.1 upstream/master HEAD -b ^io.csv # TODO: remove io.csv part once working
-          export BENCH_OUTPUT = $(asv compare upstream/master HEAD)
+          export BENCH_OUTPUT=$(asv compare upstream/master HEAD)
 
       - uses: actions/github-script@v4
         with:
