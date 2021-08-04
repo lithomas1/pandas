@@ -42,12 +42,16 @@ jobs:
           git fetch upstream
           asv machine --yes
           asv continuous -f 1.1 upstream/master HEAD -b ^io.csv.ReadCSVEngine # TODO: remove io.csv part once working
-          echo "::set-output name=BENCH_OUTPUT::$(asv compare upstream/master HEAD)"
+          echo "::set-env name=BENCH_OUTPUT::$(asv compare upstream/master HEAD)"
           # export BENCH_OUTPUT=$(asv compare upstream/master HEAD)
+
+      - name: Debug
+        run: |
+          echo $BENCH_OUTPUT
 
       - uses: actions/github-script@v4
         env:
-          BENCH_OUTPUT: ${{ steps.bench.outputs.BENCH_OUTPUT }}
+          BENCH_OUTPUT: $BENCH_OUTPUT
         with:
           script: |
             const BENCH_OUTPUT = process.env
@@ -57,4 +61,3 @@ jobs:
               repo: context.repo.repo,
               body: JSON.stringify(`${BENCH_OUTPUT}`)
             })
-          
