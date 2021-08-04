@@ -52,7 +52,7 @@ jobs:
 
       - uses: actions/github-script@v4
         env:
-          BENCH_OUTPUT: $BENCH_OUTPUT
+          BENCH_OUTPUT: ${{env.BENCH_OUTPUT}}
         with:
           script: |
             const BENCH_OUTPUT = process.env
