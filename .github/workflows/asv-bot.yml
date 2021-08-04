@@ -56,10 +56,10 @@ jobs:
         with:
           script: |
             const BENCH_OUTPUT = process.env
-            console.log(BENCH_OUTPUT)
+            console.log(BENCH_OUTPUT["BENCH_OUTPUT"])
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: JSON.stringify(BENCH_OUTPUT)
+              body: JSON.stringify(BENCH_OUTPUT["BENCH_OUTPUT"])
             })
