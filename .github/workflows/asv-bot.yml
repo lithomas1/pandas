@@ -42,8 +42,9 @@ jobs:
           git fetch upstream
           asv machine --yes
           asv continuous -f 1.1 upstream/master HEAD -b ^io.csv.ReadCSVEngine # TODO: remove io.csv part once working
-          echo "BENCH_OUTPUT=$(asv compare upstream/master HEAD)" >> $GITHUB_ENV
-          # export BENCH_OUTPUT=$(asv compare upstream/master HEAD)
+          echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
+          asv compare upstream/master HEAD >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - name: Debug
         run: |
