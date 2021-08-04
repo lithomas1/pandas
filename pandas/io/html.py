@@ -898,8 +898,22 @@ def _parse(flavor, io, match, attrs, encoding, displayed_only, **kwargs):
     compiled_match = re.compile(match)  # you can pass a compiled regex here
 
     retained = None
-    for flav in flavor:
-        parser = _parser_dispatch(flav)
+    error = None
+    for i, flav in enumerate(flavor):
+        try:
+            parser = _parser_dispatch(flav)
+        except ImportError as err:
+            # Go to next engine if current not installed
+            if len(flavor) == 1:
+                # Only one flavor, just raise
+                raise err
+            elif i < len(flavor) - 1:
+                error = err
+                continue
+            else:
+                # No engines installed
+                raise error from None
+
         p = parser(io, compiled_match, attrs, encoding, displayed_only)
 
         try:

@@ -78,6 +78,25 @@ def test_bs4_version_fails(monkeypatch, datapath):
         read_html(datapath("io", "data", "html", "spam.html"), flavor="bs4")
 
 
+@td.skip_if_no("bs4")
+@td.skip_if_no("html5lib")
+@td.skip_if_installed("lxml")
+def test_html5lib_bs4_fallback(datapath):
+    # GH 30281
+    expected = DataFrame({0: [1]})
+    result = read_html("<table><tr><td>1</td></tr></table>")[0]
+    tm.assert_frame_equal(result, expected)
+
+
+@td.skip_if_installed("bs4")
+@td.skip_if_installed("html5lib")
+@td.skip_if_installed("lxml")
+def test_no_deps_raises():
+    # If nothing is installed, recommend lxml
+    with pytest.raises(ImportError, match="lxml not found, please install it"):
+        read_html("<table><tr><td>1</td></tr></table>")
+
+
 def test_invalid_flavor():
     url = "google.com"
     flavor = "invalid flavor"

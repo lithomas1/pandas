@@ -29,7 +29,7 @@ Fixed regressions
 
 Bug fixes
 ~~~~~~~~~
--
+- Method :meth:`pandas.read_html` now falls back to ``beautifulsoup4`` and ``html5lib`` if ``lxml`` is not installed (:issue:`30281`)
 -
 
 .. ---------------------------------------------------------------------------
