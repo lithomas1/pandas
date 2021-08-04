@@ -40,8 +40,7 @@ jobs:
           channel-priority: strict
           environment-file: ${{ env.ENV_FILE }}
           use-only-tar-bz2: true
-#       - name: Build Pandas
-#         uses: ./.github/actions/build_pandas
+
       - name: Run benchmarks
         run: |
           cd asv_bench
@@ -49,5 +48,17 @@ jobs:
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
-          asv continuous -f 1.1 upstream/master HEAD | tee benchmarks.log
+          asv continuous -f 1.1 upstream/master HEAD -b ^io.csv # TODO: remove io.csv part once working
+          export BENCH_OUTPUT = $(asv compare upstream/master HEAD)
+
+      - uses: actions/github-script@v4
+        with:
+          script: |
+            const BENCH_OUTPUT = process.env
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `${BENCH_OUTPUT}`
+            })
           
