@@ -61,5 +61,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: JSON.stringify(BENCH_OUTPUT["BENCH_OUTPUT"])
+              body: BENCH_OUTPUT["BENCH_OUTPUT"]
             })
