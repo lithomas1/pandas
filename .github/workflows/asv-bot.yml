@@ -16,22 +16,40 @@ jobs:
   autotune:
     name: "Run benchmarks"
     # TODO: Support more benchmarking options later, against different branches, against self, etc
-    #if: startsWith(github.event.comment.body, '@github-actions benchmark')
+    #if: startsWith(github.event.comment.body, '@github-actions benchmark') # TODO: uncomment me once final
     runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash -l {0}
     
+    concurrency:
+      # Set concurrency to prevent abuse(full runs are ~5.5 hours !!!)
+      # each user can only run one concurrent benchmark bot at a time
+      # We don't cancel in progress jobs, but if you want to benchmark multiple PRs, you're gonna have 
+      # to wait
+      group: ${{ github.actor }}-asv
+      cancel-in-progress: false
+
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-        
-        # Don't install the full conda environment, asv will do that by itself
-      - name: Install ASV
-        run: |
-          pip install asv
+
+      - name: Cache conda
+        uses: actions/cache@v2
+        with:
+          path: ~/conda_pkgs_dir
+          key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
+
+        # Although asv sets up its own env, deps are still needed
+        # during discovery process
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          activate-environment: pandas-dev
+          channel-priority: strict
+          environment-file: ${{ env.ENV_FILE }}
+          use-only-tar-bz2: true
 
       - name: Run benchmarks
         id: bench
@@ -41,25 +59,21 @@ jobs:
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
-          asv continuous -f 1.1 upstream/master HEAD -b ^io.csv.ReadCSVEngine # TODO: remove io.csv part once working
+          asv continuous -f 1.1 upstream/master HEAD
           echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
           asv compare upstream/master HEAD >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
-
-      - name: Debug
-        run: |
-          echo $BENCH_OUTPUT
 
       - uses: actions/github-script@v4
         env:
           BENCH_OUTPUT: ${{env.BENCH_OUTPUT}}
         with:
           script: |
-            const BENCH_OUTPUT = process.env
-            console.log(BENCH_OUTPUT["BENCH_OUTPUT"])
+            const ENV_VARS = process.env
+            console.log(ENV_VARS["BENCH_OUTPUT"])
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: BENCH_OUTPUT["BENCH_OUTPUT"]
+              body: ENV_VARS["BENCH_OUTPUT"]
             })
