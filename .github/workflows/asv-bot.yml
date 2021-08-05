@@ -77,7 +77,8 @@ jobs:
         with:
           script: |
             const ENV_VARS = process.env
-            const run_url = `https://github.com/${context.repo.repo}/actions/runs/${context.run_id}`
+            const run_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.run_id}`
+            console.log(run_url)
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
