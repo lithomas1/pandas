@@ -42,6 +42,12 @@ jobs:
           path: ~/conda_pkgs_dir
           key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
 
+      - name: Cache asv environment
+        uses: actions/cache@v2
+        with:
+          path: pandas/asv_bench/env
+          key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
+
         # Although asv sets up its own env, deps are still needed
         # during discovery process
       - uses: conda-incubator/setup-miniconda@v2
@@ -60,9 +66,9 @@ jobs:
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
-          asv continuous -f 1.1 upstream/master HEAD -b ^io
+          asv continuous upstream/master HEAD -b ^io # TODO: Add back -f 1.1
           echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
-          asv compare upstream/master HEAD >> $GITHUB_ENV
+          asv compare -f 1.1 upstream/master HEAD >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
       - uses: actions/github-script@v4
