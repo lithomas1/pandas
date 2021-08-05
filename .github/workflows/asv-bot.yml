@@ -21,11 +21,11 @@ jobs:
     defaults:
       run:
         shell: bash -l {0}
-    
+
     concurrency:
       # Set concurrency to prevent abuse(full runs are ~5.5 hours !!!)
       # each user can only run one concurrent benchmark bot at a time
-      # We don't cancel in progress jobs, but if you want to benchmark multiple PRs, you're gonna have 
+      # We don't cancel in progress jobs, but if you want to benchmark multiple PRs, you're gonna have
       # to wait
       group: ${{ github.actor }}-asv
       cancel-in-progress: false
@@ -53,13 +53,14 @@ jobs:
 
       - name: Run benchmarks
         id: bench
+        continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
         run: |
           cd asv_bench
           asv check -E existing
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
-          asv continuous -f 1.1 upstream/master HEAD
+          asv continuous -f 1.1 upstream/master HEAD -b ^io
           echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
           asv compare upstream/master HEAD >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
