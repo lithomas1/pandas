@@ -1,10 +1,6 @@
 name: "ASV Bot"
 
 on:
-  # TODO: remove this, testing purposes only
-  pull_request:
-    branches:
-      - master
   issue_comment: # Pull requests are issues
     types:
       - created
@@ -16,7 +12,7 @@ jobs:
   autotune:
     name: "Run benchmarks"
     # TODO: Support more benchmarking options later, against different branches, against self, etc
-    #if: startsWith(github.event.comment.body, '@github-actions benchmark') # TODO: uncomment me once final
+    if: startsWith(github.event.comment.body, '@github-actions benchmark')
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -40,12 +36,6 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/conda_pkgs_dir
-          key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
-
-      - name: Cache asv environment
-        uses: actions/cache@v2
-        with:
-          path: pandas/asv_bench/env
           key: ${{ runner.os }}-conda-${{ hashFiles('${{ env.ENV_FILE }}') }}
 
         # Although asv sets up its own env, deps are still needed
