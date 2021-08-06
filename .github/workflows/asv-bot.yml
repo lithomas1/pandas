@@ -1,6 +1,9 @@
 name: "ASV Bot"
 
 on:
+  pull_request:
+    branches:
+      master
   issue_comment: # Pull requests are issues
     types:
       - created
@@ -68,7 +71,6 @@ jobs:
           script: |
             const ENV_VARS = process.env
             const run_url = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
-            console.log(run_url)
             github.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
