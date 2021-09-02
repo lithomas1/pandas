@@ -33,7 +33,7 @@ jobs:
         continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
         run: |
           # extracting the regex, see https://stackoverflow.com/questions/13373249/extract-substring-using-regexp-in-plain-bash
-          REGEX=(echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p")
+          echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p"
           cd asv_bench
           asv check -E existing
           git remote add upstream https://github.com/pandas-dev/pandas.git
