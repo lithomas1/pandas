@@ -28,21 +28,6 @@ jobs:
       cancel-in-progress: false
 
     steps:
-      - name: Run benchmarks
-        id: bench
-        continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
-        run: |
-          # extracting the regex, see https://stackoverflow.com/questions/13373249/extract-substring-using-regexp-in-plain-bash
-          REGEX=$(echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p")
-          cd asv_bench
-          asv check -E existing
-          git remote add upstream https://github.com/pandas-dev/pandas.git
-          git fetch upstream
-          asv machine --yes
-          asv continuous -f 1.1 -b $REGEX upstream/master HEAD
-          echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
-          asv compare -f 1.1 upstream/master HEAD >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
       - name: Checkout
         uses: actions/checkout@v2
         with:
@@ -62,6 +47,22 @@ jobs:
           channel-priority: strict
           environment-file: ${{ env.ENV_FILE }}
           use-only-tar-bz2: true
+      
+      - name: Run benchmarks
+        id: bench
+        continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
+        run: |
+          # extracting the regex, see https://stackoverflow.com/a/36798723
+          REGEX=$(echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p")
+          cd asv_bench
+          asv check -E existing
+          git remote add upstream https://github.com/pandas-dev/pandas.git
+          git fetch upstream
+          asv machine --yes
+          asv continuous -f 1.1 -b $REGEX upstream/master HEAD
+          echo 'BENCH_OUTPUT<<EOF' >> $GITHUB_ENV
+          asv compare -f 1.1 upstream/master HEAD >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
 
       - uses: actions/github-script@v4
         env:
