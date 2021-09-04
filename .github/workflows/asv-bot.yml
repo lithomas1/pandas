@@ -47,7 +47,7 @@ jobs:
           channel-priority: strict
           environment-file: ${{ env.ENV_FILE }}
           use-only-tar-bz2: true
-      
+
       - name: Run benchmarks
         id: bench
         continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
