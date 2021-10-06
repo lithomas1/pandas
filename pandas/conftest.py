@@ -189,7 +189,7 @@ def configure_tests():
     pd.set_option("chained_assignment", "raise")
     import numpy as np
     if np.core.numeric.dtype != np.dtype:
-        print(np.core.numeric.dtype)
+        print("np.core.numeric.dtype is " + np.core.numeric.dtype)
         np.core.numeric.dtype = np.dtype
 
 @pytest.fixture(autouse=True)
