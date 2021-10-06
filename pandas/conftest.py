@@ -65,6 +65,7 @@ from pandas.core.indexes.api import (
     Index,
     MultiIndex,
 )
+import warnings
 
 # Until https://github.com/numpy/numpy/issues/19078 is sorted out, just suppress
 suppress_npdev_promotion_warning = pytest.mark.filterwarnings(
@@ -189,7 +190,7 @@ def configure_tests():
     pd.set_option("chained_assignment", "raise")
     import numpy as np
     if np.core.numeric.dtype != np.dtype:
-        print("np.core.numeric.dtype is " + str(np.core.numeric.dtype))
+        warnings.warn("np.core.numeric.dtype is " + str(np.core.numeric.dtype))
         np.core.numeric.dtype = np.dtype
 
 @pytest.fixture(autouse=True)
