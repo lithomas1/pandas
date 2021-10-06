@@ -187,7 +187,10 @@ def configure_tests():
     Configure settings for all tests and test modules.
     """
     pd.set_option("chained_assignment", "raise")
-
+    import numpy as np
+    if np.core.numeric.dtype != np.dtype:
+        print(np.core.numeric.dtype)
+        np.core.numeric.dtype = np.dtype
 
 @pytest.fixture(autouse=True)
 def add_imports(doctest_namespace):
