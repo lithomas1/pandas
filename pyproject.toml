@@ -2,6 +2,7 @@
 # Minimum requirements for the build system to execute.
 # See https://github.com/scipy/scipy/pull/12940 for the AIX issue.
 requires = [
+    "meson-python",
     "setuptools>=51.0.0",
     "wheel",
     "Cython>=0.29.24,<3",  # Note: sync with setup.py, environment.yml and asv.conf.json
@@ -9,7 +10,7 @@ requires = [
 ]
 # uncomment to enable pep517 after versioneer problem is fixed.
 # https://github.com/python-versioneer/python-versioneer/issues/193
-# build-backend = "setuptools.build_meta"
+build-backend = "mesonpy"
 
 [tool.black]
 target-version = ['py38', 'py39']
