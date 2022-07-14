@@ -16,6 +16,6 @@ configure_file(
 subdir('_libs')
 
 #install_subdir('_config', install_dir: meson.current_build_dir() + 'pandas/_config')
-#py.install_sources('__init__.py',
-#                    pure: false,
-#                    subdir: 'pandas/__init__.py')
+py.install_sources('__init__.py',
+                    pure: false,
+                    subdir: 'pandas/__init__.py')

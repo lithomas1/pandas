@@ -79,7 +79,8 @@ py.extension_module(
     [_algos_common_helper, _algos_take_helper, _khash_primitive_helper, cython_sources['algos.pyx']],
     include_directories: [inc_np, klib_include],
     dependencies: [py_dep, _algos_common_helper_dep, _algos_take_helper_dep, _khash_primitive_helper_dep],
-    subdir: 'pandas/_libs'
+    subdir: 'pandas/_libs',
+    install: true
 )
 
 py.extension_module(
@@ -87,7 +88,8 @@ py.extension_module(
     cython_sources['arrays.pyx'],
     include_directories: [inc_np],
     dependencies: py_dep,
-    subdir: 'pandas/_libs'
+    subdir: 'pandas/_libs',
+    install: true
 )
 
 py.extension_module(
@@ -95,7 +97,8 @@ py.extension_module(
     cython_sources['groupby.pyx'],
     include_directories: [inc_np],
     dependencies: py_dep,
-    subdir: 'pandas/_libs'
+    subdir: 'pandas/_libs',
+    install: true
 )
 
 py.extension_module(
@@ -103,5 +106,6 @@ py.extension_module(
     cython_sources['hashing.pyx'],
     include_directories: [inc_np],
     dependencies: py_dep,
-    subdir: 'pandas/_libs'
+    subdir: 'pandas/_libs',
+    install: true
 )
