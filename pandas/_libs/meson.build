@@ -19,9 +19,49 @@ _khash_primitive_helper = custom_target('khash_primitive_helper_pxi',
         py, tempita, '@INPUT@', '-o', '@OUTDIR@'
     ]
 )
+_hashtable_class_helper = custom_target('hashtable_class_helper_pxi',
+    output: 'hashtable_class_helper.pxi',
+    input: 'hashtable_class_helper.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ]
+)
+_hashtable_func_helper = custom_target('hashtable_func_helper_pxi',
+    output: 'hashtable_func_helper.pxi',
+    input: 'hashtable_func_helper.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ]
+)
+_index_class_helper = custom_target('index_class_helper_pxi',
+    output: 'index_class_helper.pxi',
+    input: 'index_class_helper.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ]
+)
+_sparse_op_helper = custom_target('sparse_op_helper_pxi',
+    output: 'sparse_op_helper.pxi',
+    input: 'sparse_op_helper.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ]
+)
+_intervaltree_helper = custom_target('intervaltree_helper_pxi',
+    output: 'intervaltree.pxi',
+    input: 'intervaltree.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ]
+)
 _algos_common_helper_dep = declare_dependency(sources: _algos_common_helper)
 _algos_take_helper_dep = declare_dependency(sources: _algos_take_helper)
 _khash_primitive_helper_dep = declare_dependency(sources: _khash_primitive_helper)
+_hashtable_class_helper_dep = declare_dependency(sources: _hashtable_class_helper)
+_hashtable_func_helper_dep = declare_dependency(sources: _hashtable_func_helper)
+_index_class_helper_dep = declare_dependency(sources: _index_class_helper)
+_sparse_op_helper_dep = declare_dependency(sources: _sparse_op_helper)
+_intervaltree_helper = declare_dependency(sources: _intervaltree_helper)
 # TODO: can this be removed, I wish meson copied .pyx source to the build dir automatically
 # The reason we can't build the pyx files inplace and copy to build dir is because
 # the generated pxi files cannot be written to the source directory.
@@ -104,6 +144,33 @@ py.extension_module(
 py.extension_module(
     'hashing',
     cython_sources['hashing.pyx'],
+    include_directories: [inc_np],
+    dependencies: py_dep,
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'hashtable',
+    [cython_sources['hashtable.pyx'], _khash_primitive_helper, _hashtable_class_helper, _hashtable_func_helper],
+    include_directories: [inc_np, klib_include],
+    dependencies: [py_dep, _khash_primitive_helper_dep, _hashtable_class_helper_dep, _hashtable_func_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+#py.extension_module(
+#    'index',
+#    [cython_sources['index.pyx'], _index_class_helper],
+#    include_directories: [inc_np, klib_include],
+#    dependencies: [py_dep, _index_class_helper_dep],
+#    subdir: 'pandas/_libs',
+#    install: true
+#)
+
+py.extension_module(
+    'indexing',
+    ['indexing.pyx'],
     include_directories: [inc_np],
     dependencies: py_dep,
     subdir: 'pandas/_libs',
