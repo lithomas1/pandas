@@ -61,7 +61,7 @@ _hashtable_class_helper_dep = declare_dependency(sources: _hashtable_class_helpe
 _hashtable_func_helper_dep = declare_dependency(sources: _hashtable_func_helper)
 _index_class_helper_dep = declare_dependency(sources: _index_class_helper)
 _sparse_op_helper_dep = declare_dependency(sources: _sparse_op_helper)
-_intervaltree_helper = declare_dependency(sources: _intervaltree_helper)
+_intervaltree_helper_dep = declare_dependency(sources: _intervaltree_helper)
 # TODO: can this be removed, I wish meson copied .pyx source to the build dir automatically
 # The reason we can't build the pyx files inplace and copy to build dir is because
 # the generated pxi files cannot be written to the source directory.
@@ -111,6 +111,15 @@ foreach source: cython_sources_list
     )
     cython_sources += {source: source_pyx}
 endforeach
+
+#py.extension_module(
+#    'parsing',
+#    ['tslibs/parsing.pyx'],
+#    include_directories: [inc_np, klib_include, 'src/parser', 'src', 'tslibs/src/datetime'],
+#    dependencies: [py_dep],
+#   subdir: 'pandas/_libs/tslibs',
+#    install: true
+#)
 
 subdir('tslibs')
 
@@ -173,6 +182,114 @@ py.extension_module(
     ['indexing.pyx'],
     include_directories: [inc_np],
     dependencies: py_dep,
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'internals',
+    ['internals.pyx'],
+    include_directories: [inc_np],
+    dependencies: py_dep,
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+#py.extension_module(
+#    'interval',
+#    [cython_sources['interval.pyx'], _intervaltree_helper],
+#    include_directories: [inc_np, klib_include],
+#    dependencies: [py_dep, _intervaltree_helper_dep],
+#    subdir: 'pandas/_libs',
+#    install: true
+#)
+
+py.extension_module(
+    'join',
+    [cython_sources['join.pyx'], _khash_primitive_helper],
+    include_directories: [inc_np, klib_include],
+    dependencies: [py_dep, _khash_primitive_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'lib',
+    ['lib.pyx', 'src/parser/tokenizer.c'],
+    include_directories: [inc_np, klib_include, inc_datetime],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+#py.extension_module(
+#    'parsers',
+#    [cython_sources['parsers.pyx'], _khash_primitive_helper, 'src/parser/tokenizer.c', 'src/parser/io.c'],
+#    include_directories: [inc_np, klib_include, 'src/parser', 'src'],
+#    dependencies: [py_dep, _khash_primitive_helper_dep],
+#    subdir: 'pandas/_libs',
+#    install: true
+#)
+
+py.extension_module(
+    'reduction',
+    ['reduction.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'ops',
+    ['ops.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'ops_dispatch',
+    ['ops_dispatch.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'properties',
+    ['properties.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'reshape',
+    ['reshape.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'sparse',
+    [cython_sources['sparse.pyx'], _sparse_op_helper],
+    include_directories: [inc_np],
+    dependencies: [py_dep, _sparse_op_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'tslib',
+    ['tslib.pyx', 'tslibs/src/datetime/np_datetime.c'],
+    include_directories: [inc_np, inc_datetime],
+    dependencies: [py_dep],
     subdir: 'pandas/_libs',
     install: true
 )

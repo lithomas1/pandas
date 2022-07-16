@@ -8,7 +8,7 @@ incdir_numpy = run_command(py,
 
 inc_np = include_directories(incdir_numpy)
 klib_include = include_directories('_libs/src/klib')
-inc_datetime = include_directories('_libs/tslibs/src/datetime/')
+inc_datetime = include_directories('_libs/tslibs')
 
 configure_file(
     input: '__init__.py',

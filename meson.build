@@ -6,7 +6,8 @@ project(
     license: 'BSD-3',
     meson_version: '>=0.60',
     default_options: [
-        'buildtype=debugoptimized'
+        'buildtype=debugoptimized',
+        'c_std=c99'
     ]
 )
 
