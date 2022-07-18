@@ -16,6 +16,7 @@ configure_file(
     copy: true
 )
 subdir('_libs')
+subdir('io/sas')
 # TODO: this works but needs a patch in meson-python
 # meson-python only looks in the meson-info/install_plan.json not in meson-info/installed.json
 # However, subdirs are not listed in the install_plan only in installed.json

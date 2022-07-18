@@ -112,15 +112,6 @@ foreach source: cython_sources_list
     cython_sources += {source: source_pyx}
 endforeach
 
-#py.extension_module(
-#    'parsing',
-#    ['tslibs/parsing.pyx'],
-#    include_directories: [inc_np, klib_include, 'src/parser', 'src', 'tslibs/src/datetime'],
-#    dependencies: [py_dep],
-#   subdir: 'pandas/_libs/tslibs',
-#    install: true
-#)
-
 subdir('tslibs')
 
 py.extension_module(
@@ -168,14 +159,14 @@ py.extension_module(
     install: true
 )
 
-#py.extension_module(
-#    'index',
-#    [cython_sources['index.pyx'], _index_class_helper],
-#    include_directories: [inc_np, klib_include],
-#    dependencies: [py_dep, _index_class_helper_dep],
-#    subdir: 'pandas/_libs',
-#    install: true
-#)
+py.extension_module(
+    'index',
+    [cython_sources['index.pyx'], _index_class_helper],
+    include_directories: [inc_np, klib_include, 'tslibs'],
+    dependencies: [py_dep, _index_class_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
 
 py.extension_module(
     'indexing',
@@ -195,14 +186,14 @@ py.extension_module(
     install: true
 )
 
-#py.extension_module(
-#    'interval',
-#    [cython_sources['interval.pyx'], _intervaltree_helper],
-#    include_directories: [inc_np, klib_include],
-#    dependencies: [py_dep, _intervaltree_helper_dep],
-#    subdir: 'pandas/_libs',
-#    install: true
-#)
+py.extension_module(
+    'interval',
+    [cython_sources['interval.pyx'], _intervaltree_helper],
+    include_directories: [inc_np, klib_include, 'tslibs'],
+    dependencies: [py_dep, _intervaltree_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
 
 py.extension_module(
     'join',
@@ -222,14 +213,30 @@ py.extension_module(
     install: true
 )
 
-#py.extension_module(
-#    'parsers',
-#    [cython_sources['parsers.pyx'], _khash_primitive_helper, 'src/parser/tokenizer.c', 'src/parser/io.c'],
-#    include_directories: [inc_np, klib_include, 'src/parser', 'src'],
-#    dependencies: [py_dep, _khash_primitive_helper_dep],
-#    subdir: 'pandas/_libs',
-#    install: true
-#)
+py.extension_module(
+    'parsers',
+    [cython_sources['parsers.pyx'], 'src/parser/tokenizer.c', 'src/parser/io.c'],
+    include_directories: [inc_np, klib_include, 'src'],
+    dependencies: [py_dep, _khash_primitive_helper_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'json',
+    ['src/ujson/python/ujson.c',
+    'src/ujson/python/objToJSON.c',
+    'src/ujson/python/date_conversions.c',
+    'src/ujson/python/JSONtoObj.c',
+    'src/ujson/lib/ultrajsonenc.c',
+    'src/ujson/lib/ultrajsondec.c',
+    'tslibs/src/datetime/np_datetime.c',
+    'tslibs/src/datetime/np_datetime_strings.c'],
+    include_directories: [inc_np, inc_datetime, 'src/ujson/lib', 'src/ujson/python'],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
 
 py.extension_module(
     'reduction',
@@ -293,3 +300,23 @@ py.extension_module(
     subdir: 'pandas/_libs',
     install: true
 )
+
+py.extension_module(
+    'testing',
+    ['testing.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+py.extension_module(
+    'writers',
+    ['writers.pyx'],
+    include_directories: [inc_np],
+    dependencies: [py_dep],
+    subdir: 'pandas/_libs',
+    install: true
+)
+
+subdir('window')
