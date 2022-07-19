@@ -73,10 +73,7 @@ cython_sources_list = [
     'algos.pxd',
     'algos.pyx',
     'arrays.pxd',
-    'arrays.pyx',
     'dtypes.pxd',
-    'groupby.pyx',
-    'hashing.pyx',
     'hashtable.pxd',
     'hashtable.pyx',
     'index.pyx',
@@ -85,21 +82,13 @@ cython_sources_list = [
     'interval.pyx',
     'join.pyx',
     'khash.pxd',
-    'lib.pyx',
     'lib.pxd',
     'missing.pxd',
-    'missing.pyx',
-    'ops.pyx',
-    'ops_dispatch.pyx',
     'parsers.pyx',
-    'properties.pyx',
-    'reduction.pyx',
-    'reshape.pyx',
     'sparse.pyx',
     'testing.pyx',
     'tslib.pyx',
     'util.pxd',
-    'writers.pyx'
 ]
 cython_sources = {}
 
@@ -125,7 +114,7 @@ py.extension_module(
 
 py.extension_module(
     'arrays',
-    cython_sources['arrays.pyx'],
+    'arrays.pyx',
     include_directories: [inc_np],
     dependencies: py_dep,
     subdir: 'pandas/_libs',
@@ -134,7 +123,7 @@ py.extension_module(
 
 py.extension_module(
     'groupby',
-    cython_sources['groupby.pyx'],
+    'groupby.pyx',
     include_directories: [inc_np],
     dependencies: py_dep,
     subdir: 'pandas/_libs',
@@ -143,7 +132,7 @@ py.extension_module(
 
 py.extension_module(
     'hashing',
-    cython_sources['hashing.pyx'],
+    'hashing.pyx',
     include_directories: [inc_np],
     dependencies: py_dep,
     subdir: 'pandas/_libs',
@@ -318,5 +307,9 @@ py.extension_module(
     subdir: 'pandas/_libs',
     install: true
 )
+
+py.install_sources('__init__.py',
+                    pure: false,
+                    subdir: 'pandas/_libs')
 
 subdir('window')

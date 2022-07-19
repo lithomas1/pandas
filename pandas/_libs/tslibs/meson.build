@@ -173,3 +173,7 @@ py.extension_module(
     subdir: 'pandas/_libs/tslibs',
     install: true
 )
+
+py.install_sources('__init__.py',
+                    pure: false,
+                    subdir: 'pandas/_libs/tslibs')
