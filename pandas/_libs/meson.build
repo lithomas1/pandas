@@ -54,8 +54,9 @@ _intervaltree_helper = custom_target('intervaltree_helper_pxi',
         py, tempita, '@INPUT@', '-o', '@OUTDIR@'
     ]
 )
-_algos_common_helper_dep = declare_dependency(sources: _algos_common_helper)
-_algos_take_helper_dep = declare_dependency(sources: _algos_take_helper)
+#_algos_common_helper_dep = declare_dependency(sources: _algos_common_helper)
+#_algos_take_helper_dep = declare_dependency(sources: _algos_take_helper)
+_algos_helper_dep = declare_dependency(sources: [_algos_common_helper, _algos_take_helper])
 _khash_primitive_helper_dep = declare_dependency(sources: _khash_primitive_helper)
 _hashtable_class_helper_dep = declare_dependency(sources: _hashtable_class_helper)
 _hashtable_func_helper_dep = declare_dependency(sources: _hashtable_func_helper)
@@ -103,210 +104,67 @@ endforeach
 
 subdir('tslibs')
 
-py.extension_module(
-    'algos',
-    [_algos_common_helper, _algos_take_helper, _khash_primitive_helper, cython_sources['algos.pyx']],
-    include_directories: [inc_np, klib_include],
-    dependencies: [py_dep, _algos_common_helper_dep, _algos_take_helper_dep, _khash_primitive_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
+libs_sources = {
+    # Dict of extension name -> dict of {sources, include_dirs, and deps}
+    # numpy include dir is implicitly included
+    'algos': {'sources': [_algos_common_helper, _algos_take_helper, _khash_primitive_helper, cython_sources['algos.pyx']],
+              'include_dirs': klib_include,
+              'deps': [_algos_helper_dep, _khash_primitive_helper_dep]},
+    'arrays': {'sources': ['arrays.pyx']},
+    'groupby': {'sources': ['groupby.pyx']},
+    'hashing': {'sources': ['hashing.pyx']},
+    'hashtable': {'sources': [cython_sources['hashtable.pyx'], _khash_primitive_helper, _hashtable_class_helper, _hashtable_func_helper],
+                  'include_dirs': klib_include,
+                  'deps': [_khash_primitive_helper_dep, _hashtable_class_helper_dep, _hashtable_func_helper_dep]},
+    'index': {'sources': [cython_sources['index.pyx'], _index_class_helper],
+              'include_dirs': [klib_include, 'tslibs'],
+              'deps': _index_class_helper_dep},
+    'indexing': {'sources': ['indexing.pyx']},
+    'internals': {'sources': ['internals.pyx']},
+    'interval': {'sources': [cython_sources['interval.pyx'], _intervaltree_helper],
+                'include_dirs': [klib_include, 'tslibs'],
+                'deps': _intervaltree_helper_dep},
+    'join': {'sources': [cython_sources['join.pyx'], _khash_primitive_helper],
+             'include_dirs': klib_include,
+             'deps': _khash_primitive_helper_dep},
+    'lib': {'sources': ['lib.pyx', 'src/parser/tokenizer.c'],
+            'include_dirs': [klib_include, inc_datetime]},
+    'parsers': {'sources': [cython_sources['parsers.pyx'], 'src/parser/tokenizer.c', 'src/parser/io.c'],
+                'include_dirs': [klib_include, 'src'],
+                'deps': _khash_primitive_helper_dep},
+    'json': {'sources': ['src/ujson/python/ujson.c',
+                         'src/ujson/python/objToJSON.c',
+                         'src/ujson/python/date_conversions.c',
+                         'src/ujson/python/JSONtoObj.c',
+                         'src/ujson/lib/ultrajsonenc.c',
+                         'src/ujson/lib/ultrajsondec.c',
+                         'tslibs/src/datetime/np_datetime.c',
+                         'tslibs/src/datetime/np_datetime_strings.c'],
+             'include_dirs': [inc_datetime, 'src/ujson/lib', 'src/ujson/python']},
+    'reduction': {'sources': ['reduction.pyx']},
+    'ops': {'sources': ['ops.pyx']},
+    'ops_dispatch': {'sources': ['ops_dispatch.pyx']},
+    'properties': {'sources': ['properties.pyx']},
+    'reshape': {'sources': ['reshape.pyx']},
+    'sparse': {'sources': [cython_sources['sparse.pyx'], _sparse_op_helper],
+               'deps': _sparse_op_helper_dep},
+    'tslib': {'sources': ['tslib.pyx', 'tslibs/src/datetime/np_datetime.c'],
+              'include_dirs': inc_datetime},
+    'testing': {'sources': ['testing.pyx']},
+    'writers': {'sources': ['writers.pyx']}
+}
 
-py.extension_module(
-    'arrays',
-    'arrays.pyx',
-    include_directories: [inc_np],
-    dependencies: py_dep,
-    subdir: 'pandas/_libs',
-    install: true
-)
 
-py.extension_module(
-    'groupby',
-    'groupby.pyx',
-    include_directories: [inc_np],
-    dependencies: py_dep,
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'hashing',
-    'hashing.pyx',
-    include_directories: [inc_np],
-    dependencies: py_dep,
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'hashtable',
-    [cython_sources['hashtable.pyx'], _khash_primitive_helper, _hashtable_class_helper, _hashtable_func_helper],
-    include_directories: [inc_np, klib_include],
-    dependencies: [py_dep, _khash_primitive_helper_dep, _hashtable_class_helper_dep, _hashtable_func_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'index',
-    [cython_sources['index.pyx'], _index_class_helper],
-    include_directories: [inc_np, klib_include, 'tslibs'],
-    dependencies: [py_dep, _index_class_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'indexing',
-    ['indexing.pyx'],
-    include_directories: [inc_np],
-    dependencies: py_dep,
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'internals',
-    ['internals.pyx'],
-    include_directories: [inc_np],
-    dependencies: py_dep,
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'interval',
-    [cython_sources['interval.pyx'], _intervaltree_helper],
-    include_directories: [inc_np, klib_include, 'tslibs'],
-    dependencies: [py_dep, _intervaltree_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'join',
-    [cython_sources['join.pyx'], _khash_primitive_helper],
-    include_directories: [inc_np, klib_include],
-    dependencies: [py_dep, _khash_primitive_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'lib',
-    ['lib.pyx', 'src/parser/tokenizer.c'],
-    include_directories: [inc_np, klib_include, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'parsers',
-    [cython_sources['parsers.pyx'], 'src/parser/tokenizer.c', 'src/parser/io.c'],
-    include_directories: [inc_np, klib_include, 'src'],
-    dependencies: [py_dep, _khash_primitive_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'json',
-    ['src/ujson/python/ujson.c',
-    'src/ujson/python/objToJSON.c',
-    'src/ujson/python/date_conversions.c',
-    'src/ujson/python/JSONtoObj.c',
-    'src/ujson/lib/ultrajsonenc.c',
-    'src/ujson/lib/ultrajsondec.c',
-    'tslibs/src/datetime/np_datetime.c',
-    'tslibs/src/datetime/np_datetime_strings.c'],
-    include_directories: [inc_np, inc_datetime, 'src/ujson/lib', 'src/ujson/python'],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'reduction',
-    ['reduction.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'ops',
-    ['ops.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'ops_dispatch',
-    ['ops_dispatch.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'properties',
-    ['properties.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'reshape',
-    ['reshape.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'sparse',
-    [cython_sources['sparse.pyx'], _sparse_op_helper],
-    include_directories: [inc_np],
-    dependencies: [py_dep, _sparse_op_helper_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'tslib',
-    ['tslib.pyx', 'tslibs/src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'testing',
-    ['testing.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
-
-py.extension_module(
-    'writers',
-    ['writers.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs',
-    install: true
-)
+foreach ext_name, ext_dict : libs_sources
+    py.extension_module(
+        ext_name,
+        ext_dict.get('sources'),
+        include_directories: [inc_np] + ext_dict.get('include_dirs', ''),
+        dependencies: ext_dict.get('deps', ''),
+        subdir: 'pandas/_libs/tslibs',
+        install: true
+    )
+endforeach
 
 py.install_sources('__init__.py',
                     pure: false,

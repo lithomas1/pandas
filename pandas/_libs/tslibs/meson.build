@@ -27,152 +27,48 @@ foreach source: tslibs_pxd_sources_list
     )
 endforeach
 
-# TODO: build a shared library for np_datetime and np_datetime_strings
-# and use lto?
+tslibs_sources = {
+    # Dict of extension name -> dict of {sources, include_dirs, and deps}
+    # numpy include dir is implicitly included
+    'base': {'sources': ['base.pyx']},
+    'ccalendar': {'sources': ['ccalendar.pyx']},
+    'dtypes': {'sources': ['dtypes.pyx']},
+    'conversion': {'sources': ['conversion.pyx', 'src/datetime/np_datetime.c'],
+                   'include_dirs': inc_datetime},
+    'fields': {'sources': ['fields.pyx', 'src/datetime/np_datetime.c']},
+    'nattype': {'sources': ['nattype.pyx']},
+    'np_datetime': {'sources': ['np_datetime.pyx', 'src/datetime/np_datetime.c', 'src/datetime/np_datetime_strings.c'],
+                    'include_dirs': inc_datetime},
+    'offsets': {'sources': ['offsets.pyx', 'src/datetime/np_datetime.c'],
+                'include_dirs': inc_datetime},
+    'parsing': {'sources': ['parsing.pyx', '../src/parser/tokenizer.c'],
+                'include_dirs': klib_include},
+    'period': {'sources': ['period.pyx', 'src/datetime/np_datetime.c'],
+                'include_dirs': inc_datetime},
+    'strptime': {'sources': ['strptime.pyx'],
+                'include_dirs': inc_datetime},
+    'timedeltas': {'sources': ['timedeltas.pyx', 'src/datetime/np_datetime.c'],
+                   'include_dirs': inc_datetime},
+    'timestamps': {'sources': ['timestamps.pyx', 'src/datetime/np_datetime.c'],
+                   'include_dirs': inc_datetime},
+    'timezones': {'sources': ['timezones.pyx'],
+                  'include_dirs': inc_datetime},
+    'tzconversion': {'sources': ['tzconversion.pyx', 'src/datetime/np_datetime.c'],
+                     'include_dirs': inc_datetime},
+    'vectorized': {'sources': ['vectorized.pyx', 'src/datetime/np_datetime.c'],
+                    'include_dirs': inc_datetime}
+}
 
-py.extension_module(
-    'base',
-    ['base.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'ccalendar',
-    ['ccalendar.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'dtypes',
-    ['dtypes.pyx'],
-    include_directories: [inc_np],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'conversion',
-    ['conversion.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'fields',
-    ['fields.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'nattype',
-    ['nattype.pyx'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'np_datetime',
-    ['np_datetime.pyx', 'src/datetime/np_datetime.c', 'src/datetime/np_datetime_strings.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'offsets',
-    ['offsets.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'parsing',
-    ['parsing.pyx', '../src/parser/tokenizer.c'],
-    include_directories: [inc_np, klib_include],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'period',
-    ['period.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'strptime',
-    ['strptime.pyx'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'timedeltas',
-    ['timedeltas.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'timestamps',
-    ['timestamps.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'timezones',
-    ['timezones.pyx'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'tzconversion',
-    ['tzconversion.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
-
-py.extension_module(
-    'vectorized',
-    ['tzconversion.pyx', 'src/datetime/np_datetime.c'],
-    include_directories: [inc_np, inc_datetime],
-    dependencies: [py_dep],
-    subdir: 'pandas/_libs/tslibs',
-    install: true
-)
+foreach ext_name, ext_dict : tslibs_sources
+    py.extension_module(
+        ext_name,
+        ext_dict.get('sources'),
+        include_directories: [inc_np] + ext_dict.get('include_dirs', ''),
+        dependencies: ext_dict.get('deps', ''),
+        subdir: 'pandas/_libs/tslibs',
+        install: true
+    )
+endforeach
 
 py.install_sources('__init__.py',
                     pure: false,

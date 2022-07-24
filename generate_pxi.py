@@ -5,13 +5,6 @@ from Cython import Tempita
 
 
 def process_tempita(pxifile, outfile):
-    if (
-        os.path.exists(outfile)
-        and os.stat(pxifile).st_mtime < os.stat(outfile).st_mtime
-    ):
-        # if .pxi.in is not updated, no need to output .pxi
-        return
-
     with open(pxifile) as f:
         tmpl = f.read()
     pyxcontent = Tempita.sub(tmpl)
