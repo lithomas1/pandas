@@ -155,7 +155,7 @@ foreach ext_name, ext_dict : libs_sources
         ext_dict.get('sources'),
         include_directories: [inc_np] + ext_dict.get('include_dirs', ''),
         dependencies: ext_dict.get('deps', ''),
-        subdir: 'pandas/_libs/tslibs',
+        subdir: 'pandas/_libs',
         install: true
     )
 endforeach

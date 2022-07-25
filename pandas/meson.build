@@ -16,11 +16,36 @@ configure_file(
     copy: true
 )
 subdir('_libs')
-subdir('io/sas')
+subdir('io')
 # TODO: this works but needs a patch in meson-python
 # meson-python only looks in the meson-info/install_plan.json not in meson-info/installed.json
 # However, subdirs are not listed in the install_plan only in installed.json
-install_subdir('_config', install_dir: get_option('python.platlibdir') / 'pandas/_config')
-py.install_sources('__init__.py',
-                    pure: false,
-                    subdir: 'pandas')
+subdirs_list = [
+    '_config',
+    '_libs',
+    '_testing',
+    'api',
+    'arrays',
+    'compat',
+    'core',
+    'errors',
+    'plotting',
+    'tests',
+    'tseries',
+    'util'
+]
+foreach subdir: subdirs_list
+    install_subdir(subdir, install_dir: py.get_install_dir(pure: false) / 'pandas' / subdir)
+endforeach
+top_level_py_list = [
+    '__init__.py',
+    '_typing.py',
+    '_version.py',
+    'conftest.py',
+    'testing.py'
+]
+foreach file: top_level_py_list
+    py.install_sources(file,
+                       pure: false,
+                       subdir: 'pandas')
+endforeach
