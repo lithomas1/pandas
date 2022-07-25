@@ -124,6 +124,8 @@ libs_sources = {
              'deps': _khash_primitive_helper_dep},
     'lib': {'sources': ['lib.pyx', 'src/parser/tokenizer.c'],
             'include_dirs': [klib_include, inc_datetime]},
+    'missing': {'sources': ['missing.pyx'],
+                'include_dirs': [inc_datetime]},
     'parsers': {'sources': [cython_sources['parsers.pyx'], 'src/parser/tokenizer.c', 'src/parser/io.c'],
                 'include_dirs': [klib_include, 'src'],
                 'deps': _khash_primitive_helper_dep},

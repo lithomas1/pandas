@@ -35,7 +35,7 @@ subdirs_list = [
     'util'
 ]
 foreach subdir: subdirs_list
-    install_subdir(subdir, install_dir: py.get_install_dir(pure: false) / 'pandas' / subdir)
+    install_subdir(subdir, install_dir: py.get_install_dir(pure: false) / 'pandas')
 endforeach
 top_level_py_list = [
     '__init__.py',
