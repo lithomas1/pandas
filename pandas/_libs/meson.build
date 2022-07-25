@@ -1,13 +1,20 @@
-_algos_common_helper = custom_target('algos_common_helper_pxi',
-    output: 'algos_common_helper.pxi',
-    input: 'algos_common_helper.pxi.in',
-    command: [
-        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
-    ]
-)
 _algos_take_helper = custom_target('algos_take_helper_pxi',
     output: 'algos_take_helper.pxi',
     input: 'algos_take_helper.pxi.in',
+    command: [
+        py, tempita, '@INPUT@', '-o', '@OUTDIR@'
+    ],
+    # TODO: remove these two below lines
+    # Weird bug in meson that only repros on my potato computer
+    # (possibly b/c of low number of threads)?
+    # The first custom_target is never built for some reason
+    # so algos.pyx will error out later in the build.
+    build_by_default: true,
+    build_always_stale: true
+)
+_algos_common_helper = custom_target('algos_common_helper_pxi',
+    output: 'algos_common_helper.pxi',
+    input: 'algos_common_helper.pxi.in',
     command: [
         py, tempita, '@INPUT@', '-o', '@OUTDIR@'
     ]
@@ -54,15 +61,7 @@ _intervaltree_helper = custom_target('intervaltree_helper_pxi',
         py, tempita, '@INPUT@', '-o', '@OUTDIR@'
     ]
 )
-#_algos_common_helper_dep = declare_dependency(sources: _algos_common_helper)
-#_algos_take_helper_dep = declare_dependency(sources: _algos_take_helper)
-_algos_helper_dep = declare_dependency(sources: [_algos_common_helper, _algos_take_helper])
 _khash_primitive_helper_dep = declare_dependency(sources: _khash_primitive_helper)
-_hashtable_class_helper_dep = declare_dependency(sources: _hashtable_class_helper)
-_hashtable_func_helper_dep = declare_dependency(sources: _hashtable_func_helper)
-_index_class_helper_dep = declare_dependency(sources: _index_class_helper)
-_sparse_op_helper_dep = declare_dependency(sources: _sparse_op_helper)
-_intervaltree_helper_dep = declare_dependency(sources: _intervaltree_helper)
 # TODO: can this be removed, I wish meson copied .pyx source to the build dir automatically
 # The reason we can't build the pyx files inplace and copy to build dir is because
 # the generated pxi files cannot be written to the source directory.
@@ -107,23 +106,19 @@ subdir('tslibs')
 libs_sources = {
     # Dict of extension name -> dict of {sources, include_dirs, and deps}
     # numpy include dir is implicitly included
-    'algos': {'sources': [_algos_common_helper, _algos_take_helper, _khash_primitive_helper, cython_sources['algos.pyx']],
-              'include_dirs': klib_include,
-              'deps': [_algos_helper_dep, _khash_primitive_helper_dep]},
+    'algos': {'sources': [cython_sources['algos.pyx'], _algos_common_helper, _algos_take_helper, _khash_primitive_helper],
+              'include_dirs': klib_include},
     'arrays': {'sources': ['arrays.pyx']},
     'groupby': {'sources': ['groupby.pyx']},
     'hashing': {'sources': ['hashing.pyx']},
     'hashtable': {'sources': [cython_sources['hashtable.pyx'], _khash_primitive_helper, _hashtable_class_helper, _hashtable_func_helper],
-                  'include_dirs': klib_include,
-                  'deps': [_khash_primitive_helper_dep, _hashtable_class_helper_dep, _hashtable_func_helper_dep]},
+                  'include_dirs': klib_include},
     'index': {'sources': [cython_sources['index.pyx'], _index_class_helper],
-              'include_dirs': [klib_include, 'tslibs'],
-              'deps': _index_class_helper_dep},
+              'include_dirs': [klib_include, 'tslibs']},
     'indexing': {'sources': ['indexing.pyx']},
     'internals': {'sources': ['internals.pyx']},
     'interval': {'sources': [cython_sources['interval.pyx'], _intervaltree_helper],
-                'include_dirs': [klib_include, 'tslibs'],
-                'deps': _intervaltree_helper_dep},
+                'include_dirs': [klib_include, 'tslibs']},
     'join': {'sources': [cython_sources['join.pyx'], _khash_primitive_helper],
              'include_dirs': klib_include,
              'deps': _khash_primitive_helper_dep},
@@ -146,8 +141,7 @@ libs_sources = {
     'ops_dispatch': {'sources': ['ops_dispatch.pyx']},
     'properties': {'sources': ['properties.pyx']},
     'reshape': {'sources': ['reshape.pyx']},
-    'sparse': {'sources': [cython_sources['sparse.pyx'], _sparse_op_helper],
-               'deps': _sparse_op_helper_dep},
+    'sparse': {'sources': [cython_sources['sparse.pyx'], _sparse_op_helper]},
     'tslib': {'sources': ['tslib.pyx', 'tslibs/src/datetime/np_datetime.c'],
               'include_dirs': inc_datetime},
     'testing': {'sources': ['testing.pyx']},
