@@ -78,7 +78,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           CIBW_TEST_COMMAND: cd .. && python -c "import pandas; print(pandas.__version__); pandas.test(extra_args=['-m not clipboard', '--skip-slow', '--skip-network', '--skip-db', '-n=2'])"
-          CIBW_TEST_REQUIRES: hypothesis pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
+          CIBW_TEST_REQUIRES: hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           CIBW_ARCHS_MACOS: x86_64 universal2
 
 
@@ -138,7 +138,7 @@ jobs:
           # TODO: Don't run test suite, and instead build wheels from sdist
           # Depends on pypa/cibuildwheel#1020
           python -m pip install dist/*.gz
-          pip install hypothesis pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
+          pip install hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           cd .. # Not a good idea to test within the src tree
           python -c "import pandas; print(pandas.__version__); pandas.test(extra_args=['-m not clipboard', '--skip-slow', '--skip-network', '--skip-db', '-n=2'])"
       - uses: actions/upload-artifact@v3
