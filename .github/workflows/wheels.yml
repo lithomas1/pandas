@@ -132,6 +132,7 @@ jobs:
           python-version: '3.8'
       - name: Build sdist
         run: |
+          pip install build
           python -m build --sdist
       - name: Test the sdist
         run: |
