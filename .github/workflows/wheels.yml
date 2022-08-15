@@ -132,7 +132,7 @@ jobs:
           python-version: '3.8'
       - name: Build sdist
         run: |
-          python setup.py sdist
+          python -m build --sdist
       - name: Test the sdist
         run: |
           # TODO: Don't run test suite, and instead build wheels from sdist
