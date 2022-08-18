@@ -5,7 +5,7 @@
 # not run on each push but only weekly and for releases.
 # Wheel builds can be triggered from the Actions page
 # (if you have the perms) on a commit to master.
-# 
+#
 # Alternatively, you can add labels to the pull request in order to trigger wheel
 # builds.
 # The label(s) that trigger builds are:
@@ -77,9 +77,9 @@ jobs:
         uses: pypa/cibuildwheel@v2.4.0
         env:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
-          CIBW_TEST_COMMAND: > 
-                            cd .. && 
-                            python -c "import pandas; print(pandas.__version__); 
+          CIBW_TEST_COMMAND: >
+                            cd .. &&
+                            python -c "import pandas; print(pandas.__version__);
                             pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
                             pandas.test(extra_args=['-m not clipboard and single_cpu', '--skip-slow', '--skip-network', '--skip-db'])"
           CIBW_TEST_REQUIRES: hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
@@ -145,7 +145,7 @@ jobs:
           python -m pip install dist/*.gz
           pip install hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           cd .. # Not a good idea to test within the src tree
-          python -c "import pandas; print(pandas.__version__); 
+          python -c "import pandas; print(pandas.__version__);
           pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
           pandas.test(extra_args=['-m not clipboard and single_cpu', '--skip-slow', '--skip-network', '--skip-db'])"
       - uses: actions/upload-artifact@v3
