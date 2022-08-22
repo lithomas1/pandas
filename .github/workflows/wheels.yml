@@ -78,6 +78,7 @@ jobs:
         env:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           CIBW_ENVIRONMENT_LINUX: RUNNER_OS='Linux' # RUNNER_OS env var needs to be passed through into container
+                                  IS_32_BIT=${{ env.IS_32_BIT }}
           CIBW_TEST_COMMAND_LINUX: "{project}/ci/test_wheels.sh"
           CIBW_TEST_COMMAND_MACOS: "{project}/ci/test_wheels.sh"
           CIBW_TEST_COMMAND_WINDOWS: "{project}/ci/test_wheels.bat"
