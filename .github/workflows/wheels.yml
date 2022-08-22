@@ -77,8 +77,8 @@ jobs:
         uses: pypa/cibuildwheel@v2.9.0
         env:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
-          CIBW_ENVIRONMENT_LINUX: RUNNER_OS='Linux' # RUNNER_OS env var needs to be passed through into container
-                                  IS_32_BIT='${{ env.IS_32_BIT }}'
+          CIBW_ENVIRONMENT: RUNNER_OS= ${{ runner.os }}
+                            IS_32_BIT='${{ env.IS_32_BIT }}'
           CIBW_TEST_COMMAND: "bash {project}/ci/test_wheels.sh"
           CIBW_TEST_REQUIRES: hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           CIBW_ARCHS_MACOS: x86_64 universal2
