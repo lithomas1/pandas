@@ -82,7 +82,7 @@ jobs:
                             PYTHON_VERSION=$(python -c "import platform; print(platform.python_version())")
                             if [[$RUNNER_OS == "Windows" ]]; then
                               docker pull python:$(PYTHON_VERSION)-windowsservercore
-                              docker run -v $(pwd):/pandas python:$(PYTHON_VERSION)-windowsservercore \
+                              docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore \
                               cmd.exe "python --version &&
                               pip install pytz six numpy python-dateutil &&
                               pip install --find-links=pandas/pandas/dist --no-index pandas &&
