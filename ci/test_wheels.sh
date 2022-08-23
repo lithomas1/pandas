@@ -16,6 +16,7 @@ pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--ski
 else
     if [[ $RUNNER_OS == "Windows" ]]; then
       docker pull python:$PYTHON_VERSION-windowsservercore
+      echo $(pwd)
       docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels.sh
     else
       python -c "import pandas; print(pandas.__version__);
