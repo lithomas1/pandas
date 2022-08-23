@@ -17,7 +17,8 @@ else
     if [[ $RUNNER_OS == "Windows" ]]; then
       docker pull python:$PYTHON_VERSION-windowsservercore
       echo $(pwd)
-      docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels.sh
+      echo $(ls)
+      docker run -v $(pwd)/pandas/pandas:/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels_windows.bat
     else
       python -c "import pandas; print(pandas.__version__);
 pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
