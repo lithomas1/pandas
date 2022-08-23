@@ -1,6 +1,6 @@
 #!/bin/bash
 PYTHON_VERSION=$(python -c "import platform; print(platform.python_version())")
-if [[ $IS_32_BIT ]]; then
+if [[ $IS_32_BIT == "true" ]]; then
     if [[ $RUNNER_OS == "Windows" ]]; then
       exit 0
     fi
