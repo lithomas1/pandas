@@ -10,22 +10,22 @@ if [[ $IS_32_BIT == "true" ]]; then
     pip install pytz six numpy python-dateutil \
     pip install --find-links=pandas/pandas/dist --no-index pandas \
     python -c 'import pandas as pd;
-                print(pd.__version__);
-                pandas.test(extra_args=["-m not clipboard and not single_cpu", "--skip-slow", "--skip-network", "--skip-db", "-n=2"]);
-                pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--skip-network", "--skip-db"])'"
+    print(pd.__version__);
+    pandas.test(extra_args=["-m not clipboard and not single_cpu", "--skip-slow", "--skip-network", "--skip-db", "-n=2"]);
+    pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--skip-network", "--skip-db"])'"
 else
     if [[ $RUNNER_OS == "Windows" ]]; then
       docker pull python:$PYTHON_VERSION-windowsservercore
       docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore \
-      cmd.exe "python --version &&
-              pip install pytz six numpy python-dateutil &&
-              pip install --find-links=pandas/pandas/dist --no-index pandas &&
-              python -c 'import pandas as pd;
-                          print(pd.__version__);
-                          pandas.test(extra_args=["-m not clipboard and not single_cpu", "--skip-slow", "--skip-network", "--skip-db", "-n=2"]);
-                          pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--skip-network", "--skip-db"])'"
+      cmd.exe /c "python --version &&
+                  pip install pytz six numpy python-dateutil &&
+                  pip install --find-links=pandas/pandas/dist --no-index pandas &&
+                  python -c 'import pandas as pd;
+                  print(pd.__version__);
+                  pandas.test(extra_args=["-m not clipboard and not single_cpu", "--skip-slow", "--skip-network", "--skip-db", "-n=2"]);
+                  pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--skip-network", "--skip-db"])'"
     else
-      python -c "import pandas; print(pandas.__version__);
+      python -c "import pandas; print(pandas.__version__); 
       pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
       pandas.test(extra_args=['-m not clipboard and single_cpu', '--skip-slow', '--skip-network', '--skip-db'])"
     fi
