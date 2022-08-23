@@ -17,7 +17,7 @@ else
     if [[ $RUNNER_OS == "Windows" ]]; then
       docker pull python:$PYTHON_VERSION-windowsservercore
       docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore \
-      "python --version &&
+      cmd.exe /c "python --version &&
       pip install pytz six numpy python-dateutil &&
       pip install --find-links=pandas/pandas/dist --no-index pandas &&
       python -c 'import pandas as pd;
