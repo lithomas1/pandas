@@ -17,6 +17,7 @@ else
     if [[ $RUNNER_OS == "Windows" ]]; then
       cd $(dirname $0)
       cd ..
+      echo $(pwd)
       docker pull python:$PYTHON_VERSION-windowsservercore
       docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels_windows.bat
     else
