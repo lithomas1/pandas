@@ -15,6 +15,8 @@ pandas.test(extra_args=["-m not clipboard and not single_cpu", "--skip-slow", "-
 pandas.test(extra_args=["-m not clipboard and single_cpu", "--skip-slow", "--skip-network", "--skip-db"])'"
 else
     if [[ $RUNNER_OS == "Windows" ]]; then
+      cd $(dirname $0)
+      cd ..
       docker pull python:$PYTHON_VERSION-windowsservercore
       docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels_windows.bat
     else
