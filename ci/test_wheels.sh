@@ -19,7 +19,7 @@ else
       cd ..
       echo $(pwd)
       docker pull python:$PYTHON_VERSION-windowsservercore
-      docker run -v $(pwd):/pandas python:$PYTHON_VERSION-windowsservercore /pandas/ci/test_wheels_windows.bat
+      docker run -v `pwd`:`pwd` -w `pwd` python:$PYTHON_VERSION-windowsservercore ci/test_wheels_windows.bat
     else
       python -c "import pandas; print(pandas.__version__);
 pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
