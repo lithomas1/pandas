@@ -96,7 +96,7 @@ jobs:
           PANDAS_STAGING_UPLOAD_TOKEN: ${{ secrets.PANDAS_STAGING_UPLOAD_TOKEN }}
           PANDAS_NIGHTLY_UPLOAD_TOKEN: ${{ secrets.PANDAS_NIGHTLY_UPLOAD_TOKEN }}
         run: |
-          source scripts/upload_wheels.sh
+          source ci/upload_wheels.sh
           set_upload_vars
           # trigger an upload to
           # https://anaconda.org/scipy-wheels-nightly/pandas
