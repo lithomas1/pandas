@@ -18,7 +18,6 @@ if os.name == "nt":
     dist_dir = os.path.join(pandas_base_dir, "dist")
     print(f"Copying wheel into pandas_base_dir/dist ({dist_dir})")
     shutil.copy(wheel_path, dist_dir)
-    print(os.listdir(dist_dir))
     subprocess.run(f'docker run -v %cd%:c:\pandas '
                    f'python:{py_ver}-windowsservercore /pandas/ci/test_wheels_windows.bat', check=True, shell=True, cwd=pandas_base_dir)
 else:
