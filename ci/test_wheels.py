@@ -13,7 +13,7 @@ if os.name == "nt":
         sys.exit(0) # No way to test Windows 32-bit(no docker image)
     print(f"Pulling docker image to test Windows 64-bit Python {py_ver}")
     subprocess.run(f"docker pull python:{py_ver}-windowsservercore", check=True)
-    pandas_base_dir = os.path.join(os.path.dirname(__file__), '..')
+    pandas_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     print(f"pandas project dir is {pandas_base_dir}")
     dist_dir = os.path.join(pandas_base_dir, "dist")
     print(f"Copying wheel into pandas_base_dir/dist ({dist_dir})")
