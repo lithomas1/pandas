@@ -5,7 +5,7 @@ import subprocess
 import shutil
 py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
-wheel_path = sys.argv[0]
+wheel_path = sys.argv[1]
 print(f"IS_32_BIT is {is_32_bit}")
 print(f"Path to built wheel is {wheel_path}")
 if os.name == "nt":
