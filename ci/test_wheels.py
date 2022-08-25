@@ -3,7 +3,7 @@ import os
 import sys
 import subprocess
 py_ver = platform.python_version()
-is_32_bit = (os.getenv('IS_32_BIT') == "false")
+is_32_bit = (os.getenv('IS_32_BIT') == "true")
 print(f"IS_32_BIT is {is_32_bit}")
 if os.name == "nt":
     if is_32_bit:
