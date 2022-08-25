@@ -2,8 +2,10 @@ import platform
 import os
 import sys
 import subprocess
+import shutil
 py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
+wheel_path = sys.argv[0]
 print(f"IS_32_BIT is {is_32_bit}")
 if os.name == "nt":
     if is_32_bit:
@@ -12,6 +14,9 @@ if os.name == "nt":
     subprocess.run(f"docker pull python:{py_ver}-windowsservercore", check=True)
     pandas_base_dir = os.path.join(os.path.dirname(__file__), '..')
     print(f"pandas project dir is {pandas_base_dir}")
+    dist_dir = os.path.join(pandas_base_dir, "dist")
+    print(f"Copying wheel into pandas base dir/dist ({dist_dir})")
+    shutil.copy(wheel_path, dist_dir)
     subprocess.run(f'docker run -v %cd%:c:\pandas '
                    f'python:{py_ver}-windowsservercore /pandas/ci/test_wheels_windows.bat', check=True, shell=True, cwd=pandas_base_dir)
 else:
