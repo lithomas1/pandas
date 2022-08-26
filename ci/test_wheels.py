@@ -5,12 +5,18 @@ import subprocess
 import shutil
 py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
-wheel_path = sys.argv[1]
+try:
+    wheel_path = sys.argv[1]
+except IndexError:
+    # Not passed
+    wheel_path = None
 print(f"IS_32_BIT is {is_32_bit}")
 print(f"Path to built wheel is {wheel_path}")
 if os.name == "nt":
     if is_32_bit:
         sys.exit(0) # No way to test Windows 32-bit(no docker image)
+    if wheel_path is None:
+        raise ValueError("Wheel path must be passed in if on 64-bit Windows")
     print(f"Pulling docker image to test Windows 64-bit Python {py_ver}")
     subprocess.run(f"docker pull python:{py_ver}-windowsservercore", check=True)
     pandas_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))

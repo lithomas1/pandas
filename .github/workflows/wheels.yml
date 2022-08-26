@@ -79,10 +79,18 @@ jobs:
           CIBW_BUILD: ${{ matrix.python }}-${{ matrix.buildplat[1] }}
           CIBW_ENVIRONMENT: RUNNER_OS='${{ runner.os }}'
                             IS_32_BIT='${{ env.IS_32_BIT }}'
-          CIBW_TEST_COMMAND: "python {project}/ci/test_wheels.py {wheel}"
+          CIBW_TEST_COMMAND_LINUX: "python {project}/ci/test_wheels.py"
+          CIBW_TEST_COMMAND_MACOS: "python {project}/ci/test_wheels.py"
           CIBW_TEST_REQUIRES: hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           CIBW_ARCHS_MACOS: x86_64 universal2
 
+      - name: Test wheels (Windows only)
+        if: ${{ matrix.buildplat[1] == "win_amd64"}}
+        shell: bash
+        run: |
+          # We can't test directly with cibuildwheel, since we need to have to wheel location
+          # to mount into the docker image
+          dir /s /b wheelhouse\*.whl | python ci/test_wheels.py
 
       - uses: actions/upload-artifact@v3
         with:
