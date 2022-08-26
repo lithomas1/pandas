@@ -90,6 +90,7 @@ jobs:
         if: ${{ matrix.buildplat[1] == 'win_amd64' }}
         shell: cmd
         run: |
+          dir /s /b wheelhouse\*.whl
           dir /s /b wheelhouse\*.whl | python ci/test_wheels.py
 
       - uses: actions/upload-artifact@v3
