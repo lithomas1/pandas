@@ -6,11 +6,12 @@ import shutil
 py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
 try:
-    wheel_path = sys.argv[1]
+    wheel_dir = sys.argv[1]
 except IndexError:
     # Not passed
-    wheel_path = None
+    wheel_dir = None
 print(f"IS_32_BIT is {is_32_bit}")
+wheel_path = glob.glob("*.whl", root_dir=wheel_dir)[0]
 print(f"Path to built wheel is {wheel_path}")
 if os.name == "nt":
     if is_32_bit:
