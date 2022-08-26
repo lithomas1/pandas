@@ -86,7 +86,6 @@ jobs:
 
       - name: Test wheels (Windows only)
         if: ${{ matrix.buildplat[1] == 'win_amd64' }}
-        shell: bash
         run: |
           # We can't test directly with cibuildwheel, since we need to have to wheel location
           # to mount into the docker image
@@ -166,7 +165,7 @@ jobs:
           PANDAS_STAGING_UPLOAD_TOKEN: ${{ secrets.PANDAS_STAGING_UPLOAD_TOKEN }}
           PANDAS_NIGHTLY_UPLOAD_TOKEN: ${{ secrets.PANDAS_NIGHTLY_UPLOAD_TOKEN }}
         run: |
-          source scripts/upload_wheels.sh
+          source ci/upload_wheels.sh
           set_upload_vars
           # trigger an upload to
           # https://anaconda.org/scipy-wheels-nightly/pandas
