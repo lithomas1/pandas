@@ -86,6 +86,7 @@ jobs:
 
       - name: Test wheels (Windows only)
         if: ${{ matrix.buildplat[1] == 'win_amd64' }}
+        shell: cmd
         run: |
           # We can't test directly with cibuildwheel, since we need to have to wheel location
           # to mount into the docker image
