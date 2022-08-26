@@ -85,7 +85,7 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 universal2
 
       - name: Test wheels (Windows only)
-        if: ${{ matrix.buildplat[1] == "win_amd64" }}
+        if: ${{ matrix.buildplat[1] == 'win_amd64' }}
         shell: bash
         run: |
           # We can't test directly with cibuildwheel, since we need to have to wheel location
