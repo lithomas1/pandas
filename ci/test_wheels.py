@@ -8,7 +8,7 @@ py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
 try:
     wheel_dir = sys.argv[1]
-    wheel_path = os.path.join(wheel_dir, glob.glob("*.whl", root_dir=wheel_dir)[0])
+    wheel_path = glob.glob(f"{wheel_dir}/*.whl")[0]
 except IndexError:
     # Not passed
     wheel_path = None
