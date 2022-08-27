@@ -8,11 +8,11 @@ py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
 try:
     wheel_dir = sys.argv[1]
+    wheel_path = os.path.join(wheel_dir, glob.glob("*.whl", root_dir=wheel_dir)[0])
 except IndexError:
     # Not passed
-    wheel_dir = None
+    wheel_path = None
 print(f"IS_32_BIT is {is_32_bit}")
-wheel_path = os.path.join(wheel_dir, glob.glob("*.whl", root_dir=wheel_dir)[0])
 print(f"Path to built wheel is {wheel_path}")
 if os.name == "nt":
     if is_32_bit:
@@ -26,6 +26,7 @@ if os.name == "nt":
     dist_dir = os.path.join(pandas_base_dir, "dist")
     print(f"Copying wheel into pandas_base_dir/dist ({dist_dir})")
     shutil.copy(wheel_path, dist_dir)
+    print(os.listdir(dist_dir))
     subprocess.run(f'docker run -v %cd%:c:\pandas '
                    f'python:{py_ver}-windowsservercore /pandas/ci/test_wheels_windows.bat', check=True, shell=True, cwd=pandas_base_dir)
 else:
