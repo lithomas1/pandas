@@ -84,7 +84,7 @@ jobs:
           CIBW_TEST_COMMAND_LINUX: "python {project}/ci/test_wheels.py"
           CIBW_TEST_COMMAND_MACOS: "python {project}/ci/test_wheels.py"
           CIBW_TEST_REQUIRES: hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
-          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "python {project}/ci/fix_wheels.py {wheel} {dest_dir}"
+          CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "python ci/fix_wheels.py {wheel} {dest_dir}"
           CIBW_ARCHS_MACOS: x86_64 universal2
 
       - name: Test wheels (Windows only)
