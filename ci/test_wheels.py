@@ -12,7 +12,7 @@ except IndexError:
     # Not passed
     wheel_dir = None
 print(f"IS_32_BIT is {is_32_bit}")
-wheel_path = glob.glob("*.whl", root_dir=wheel_dir)[0]
+wheel_path = os.path.join(wheel_dir, glob.glob("*.whl", root_dir=wheel_dir)[0])
 print(f"Path to built wheel is {wheel_path}")
 if os.name == "nt":
     if is_32_bit:
