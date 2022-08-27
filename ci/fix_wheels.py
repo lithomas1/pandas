@@ -1,5 +1,8 @@
 import shutil
 import zipfile
+import sys
+import os
+
 try:
     _, wheel_path, dest_dir, is_32 = sys.argv
     PYTHON_ARCH = "x86" if is32 else "x64"
