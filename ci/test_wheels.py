@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 import shutil
+import glob
 py_ver = platform.python_version()
 is_32_bit = (os.getenv('IS_32_BIT') == "true")
 try:
