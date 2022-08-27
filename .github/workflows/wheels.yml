@@ -85,7 +85,7 @@ jobs:
       # Used to push the built wheels
       - uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python[0] }}
+          python-version: ${{ matrix.python[1] }}
 
       - name: Test wheels (Windows 64-bit only)
         if: ${{ matrix.buildplat[1] == 'win_amd64' }}
