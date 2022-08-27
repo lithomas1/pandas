@@ -87,7 +87,7 @@ jobs:
           CIBW_REPAIR_WHEEL_COMMAND_WINDOWS: "python ci/fix_wheels.py {wheel} {dest_dir}"
           CIBW_ARCHS_MACOS: x86_64 universal2
 
-      - name: Test wheels (Windows only)
+      - name: Test wheels (Windows 64-bit only)
         if: ${{ matrix.buildplat[1] == 'win_amd64' }}
         shell: cmd
         run: |

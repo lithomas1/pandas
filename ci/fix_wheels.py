@@ -7,7 +7,7 @@ import struct
 try:
     _, wheel_path, dest_dir= sys.argv
     # Figure out whether we are building on 32 or 64 bit python
-    is_32 = struct.calcsize("P") * 8 == 64
+    is_32 = struct.calcsize("P") * 8 == 32
     PYTHON_ARCH = "x86" if is_32 else "x64"
 except ValueError:
     # Too many/little values to unpack
