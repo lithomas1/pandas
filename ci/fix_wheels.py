@@ -2,15 +2,17 @@ import shutil
 import zipfile
 import sys
 import os
+import struct
 
 try:
-    _, wheel_path, dest_dir, is_32 = sys.argv
+    _, wheel_path, dest_dir= sys.argv
+    # Figure out whether we are building on 32 or 64 bit python
+    is_32 = struct.calcsize("P") * 8 == 64
     PYTHON_ARCH = "x86" if is32 else "x64"
 except ValueError:
     # Too many/little values to unpack
     raise ValueError("User must pass in the path to the wheel"
-                    "destination directory, and whether the Python is 32/64-bit"
-                    "for the repaired wheel.")
+                    "and the destination directory.")
 # Wheels are zip files
 if not os.path.isdir(dest_dir):
     print(f"Created directory {dest_dir}")
@@ -26,7 +28,8 @@ with zipfile.ZipFile(repaired_wheel_path, "a") as zipf:
         base_redist_dir = f"C:/Program Files (x86)/Microsoft Visual Studio/2019/Enterprise/VC/Redist/MSVC/14.29.30133/{PYTHON_ARCH}/Microsoft.VC142.CRT/"
         zipf.write(os.path.join(base_redist_dir, "msvcp140.dll"), "pandas/_libs/window")
         zipf.write(os.path.join(base_redist_dir, "concrt140.dll"), "pandas/_libs/window")
-        zipf.write(os.path.join(base_redist_dir, "vcruntime140_1.dll"), "pandas/_libs/window")
+        if not is_32:
+            zipf.write(os.path.join(base_redist_dir, "vcruntime140_1.dll"), "pandas/_libs/window")
     except Exception as e:
         success = False
         exception = e
