@@ -17,7 +17,7 @@ runs:
         install_dir=$(python -c "import sysconfig; print(sysconfig.get_path('platlib'))")
         meson setup builddir
         cd builddir
-        meson configure '-Dprefix=$install_dir'
+        meson configure -Dprefix=$install_dir
         meson compile
         meson install
       shell: bash -el {0}
