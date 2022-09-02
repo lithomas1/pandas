@@ -8,6 +8,7 @@ dependencies:
   - python=3.8[build=*_pypy] # TODO: use this once pypy3.8 is available
 
   # tools
+  - meson
   - cython>=0.29.32
   - pytest>=6.0
   - pytest-cov

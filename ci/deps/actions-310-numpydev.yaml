@@ -6,6 +6,7 @@ dependencies:
 
   # tools
   - pytest>=6.0
+  - meson
   - pytest-cov
   - pytest-xdist>=1.31
   - hypothesis>=5.5.3

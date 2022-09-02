@@ -6,6 +6,7 @@ dependencies:
 
   # test dependencies
   - cython>=0.29.32
+  - meson
   - pytest>=6.0
   - pytest-cov
   - pytest-xdist>=1.31
