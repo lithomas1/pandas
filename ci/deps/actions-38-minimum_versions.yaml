@@ -57,3 +57,4 @@ dependencies:
   - zstandard=0.15.2
   - pip:
       - "git+https://github.com/mesonbuild/meson.git@master"
+      - "git+https://github.com/FFY00/meson-python.git@main"
