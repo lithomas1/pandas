@@ -71,4 +71,4 @@ dependencies:
   - pytorch
   - pip:
       - "git+https://github.com/mesonbuild/meson.git@master"
-      - "git+https://github.com/FFY00/meson-python.git@main"
+      - "git+https://github.com/lithomas1/meson-python.git@fix-install-subdirs"
