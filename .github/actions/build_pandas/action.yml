@@ -13,13 +13,7 @@ runs:
     - name: Build Pandas
       run: |
         # TODO: uncomment this after meson/meson-python bugs patched
-        #python -m pip install . -v
-        install_dir=$(python -c "import sysconfig; print(sysconfig.get_path('platlib'))")
-        meson setup builddir
-        cd builddir
-        meson configure -Dprefix=$install_dir
-        meson compile
-        meson install
+        python -m pip install . --no-build-isolation
       shell: bash -el {0}
 #      env:
 #        # Cannot use parallel compilation on Windows, see https://github.com/pandas-dev/pandas/issues/30873

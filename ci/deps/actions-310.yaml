@@ -6,7 +6,6 @@ dependencies:
 
   # test dependencies
   - cython>=0.29.32
-  - meson
   - pytest>=6.0
   - pytest-cov
   - pytest-xdist>=1.31
@@ -54,3 +53,5 @@ dependencies:
   - xlsxwriter
   - xlwt
   - zstandard
+  - pip:
+      - "git+https://github.com/mesonbuild/meson.git@master"

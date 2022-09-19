@@ -6,7 +6,6 @@ dependencies:
   - python=3.8
 
   # test dependencies
-  - meson
   - cython>=0.29.32
   - pytest>=6.0
   - pytest-cov
@@ -70,3 +69,5 @@ dependencies:
   - pyyaml
   - py
   - pytorch
+  - pip:
+      - "git+https://github.com/mesonbuild/meson.git@master"

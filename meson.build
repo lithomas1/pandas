@@ -12,7 +12,7 @@ project(
 )
 
 py_mod = import('python')
-py = py_mod.find_installation('python3')
+py = py_mod.find_installation('python')
 py_dep = py.dependency()
 tempita = files('generate_pxi.py')
 

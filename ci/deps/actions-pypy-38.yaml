@@ -8,7 +8,6 @@ dependencies:
   - python=3.8[build=*_pypy] # TODO: use this once pypy3.8 is available
 
   # tools
-  - meson
   - cython>=0.29.32
   - pytest>=6.0
   - pytest-cov
@@ -20,3 +19,5 @@ dependencies:
   - numpy
   - python-dateutil
   - pytz
+  - pip:
+      - "git+https://github.com/mesonbuild/meson.git@master"
