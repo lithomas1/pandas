@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import (
     TYPE_CHECKING,
+    Iterator,
     cast,
 )
 
@@ -31,6 +32,7 @@ from pandas._libs.tslibs.timedeltas import (
     parse_timedelta_unit,
 )
 from pandas._typing import (
+    AxisInt,
     DtypeObj,
     NpDtype,
     npt,
@@ -304,7 +306,7 @@ class TimedeltaArray(dtl.TimelikeOps):
 
         return dtl.DatetimeLikeArrayMixin.astype(self, dtype, copy=copy)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         if self.ndim > 1:
             for i in range(len(self)):
                 yield self[i]
@@ -326,7 +328,7 @@ class TimedeltaArray(dtl.TimelikeOps):
     def sum(
         self,
         *,
-        axis: int | None = None,
+        axis: AxisInt | None = None,
         dtype: NpDtype | None = None,
         out=None,
         keepdims: bool = False,
@@ -346,7 +348,7 @@ class TimedeltaArray(dtl.TimelikeOps):
     def std(
         self,
         *,
-        axis: int | None = None,
+        axis: AxisInt | None = None,
         dtype: NpDtype | None = None,
         out=None,
         ddof: int = 1,

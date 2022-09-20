@@ -10,6 +10,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     Callable,
+    Iterator,
     Literal,
     Sequence,
     TypeVar,
@@ -51,6 +52,7 @@ from pandas._libs.tslibs.np_datetime import compare_mismatched_resolutions
 from pandas._libs.tslibs.timestamps import integer_op_not_supported
 from pandas._typing import (
     ArrayLike,
+    AxisInt,
     DatetimeLikeScalar,
     Dtype,
     DtypeObj,
@@ -64,6 +66,7 @@ from pandas._typing import (
 from pandas.compat.numpy import function as nv
 from pandas.errors import (
     AbstractMethodError,
+    InvalidComparison,
     NullFrequencyError,
     PerformanceWarning,
 )
@@ -152,15 +155,6 @@ DTScalarOrNaT = Union[DatetimeLikeScalar, NaTType]
 DatetimeLikeArrayT = TypeVar("DatetimeLikeArrayT", bound="DatetimeLikeArrayMixin")
 
 
-class InvalidComparison(Exception):
-    """
-    Raised by _validate_comparison_value to indicate to caller it should
-    return invalid_comparison.
-    """
-
-    pass
-
-
 class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
     """
     Shared Base/Mixin class for DatetimeArray, TimedeltaArray, PeriodArray
@@ -183,7 +177,9 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
     def _can_hold_na(self) -> bool:
         return True
 
-    def __init__(self, data, dtype: Dtype | None = None, freq=None, copy=False) -> None:
+    def __init__(
+        self, data, dtype: Dtype | None = None, freq=None, copy: bool = False
+    ) -> None:
         raise AbstractMethodError(self)
 
     @property
@@ -287,7 +283,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
         """
         return lib.map_infer(values, self._box_func, convert=False)
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator:
         if self.ndim > 1:
             return (self[n] for n in range(len(self)))
         else:
@@ -418,7 +414,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
 
         self._maybe_clear_freq()
 
-    def _maybe_clear_freq(self):
+    def _maybe_clear_freq(self) -> None:
         # inplace operations like __setitem__ may invalidate the freq of
         # DatetimeArray and TimedeltaArray
         pass
@@ -535,7 +531,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
     def _concat_same_type(
         cls: type[DatetimeLikeArrayT],
         to_concat: Sequence[DatetimeLikeArrayT],
-        axis: int = 0,
+        axis: AxisInt = 0,
     ) -> DatetimeLikeArrayT:
         new_obj = super()._concat_same_type(to_concat, axis)
 
@@ -1606,7 +1602,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
     # --------------------------------------------------------------
     # Reductions
 
-    def min(self, *, axis: int | None = None, skipna: bool = True, **kwargs):
+    def min(self, *, axis: AxisInt | None = None, skipna: bool = True, **kwargs):
         """
         Return the minimum value of the Array or minimum along
         an axis.
@@ -1635,7 +1631,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
         result = nanops.nanmin(self._ndarray, axis=axis, skipna=skipna)
         return self._wrap_reduction_result(axis, result)
 
-    def max(self, *, axis: int | None = None, skipna: bool = True, **kwargs):
+    def max(self, *, axis: AxisInt | None = None, skipna: bool = True, **kwargs):
         """
         Return the maximum value of the Array or maximum along
         an axis.
@@ -1664,7 +1660,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
         result = nanops.nanmax(self._ndarray, axis=axis, skipna=skipna)
         return self._wrap_reduction_result(axis, result)
 
-    def mean(self, *, skipna: bool = True, axis: int | None = 0):
+    def mean(self, *, skipna: bool = True, axis: AxisInt | None = 0):
         """
         Return the mean value of the Array.
 
@@ -1703,7 +1699,7 @@ class DatetimeLikeArrayMixin(OpsMixin, NDArrayBackedExtensionArray):
         )
         return self._wrap_reduction_result(axis, result)
 
-    def median(self, *, axis: int | None = None, skipna: bool = True, **kwargs):
+    def median(self, *, axis: AxisInt | None = None, skipna: bool = True, **kwargs):
         nv.validate_median((), kwargs)
 
         if axis is not None and abs(axis) >= self.ndim:
@@ -1946,7 +1942,9 @@ class TimelikeOps(DatetimeLikeArrayMixin):
 
     _default_dtype: np.dtype
 
-    def __init__(self, values, dtype=None, freq=lib.no_default, copy: bool = False):
+    def __init__(
+        self, values, dtype=None, freq=lib.no_default, copy: bool = False
+    ) -> None:
         values = extract_array(values, extract_numpy=True)
         if isinstance(values, IntegerArray):
             values = values.to_numpy("int64", na_value=iNaT)
@@ -2078,11 +2076,11 @@ class TimelikeOps(DatetimeLikeArrayMixin):
     # --------------------------------------------------------------
     # Reductions
 
-    def any(self, *, axis: int | None = None, skipna: bool = True) -> bool:
+    def any(self, *, axis: AxisInt | None = None, skipna: bool = True) -> bool:
         # GH#34479 discussion of desired behavior long-term
         return nanops.nanany(self._ndarray, axis=axis, skipna=skipna, mask=self.isna())
 
-    def all(self, *, axis: int | None = None, skipna: bool = True) -> bool:
+    def all(self, *, axis: AxisInt | None = None, skipna: bool = True) -> bool:
         # GH#34479 discussion of desired behavior long-term
         return nanops.nanall(self._ndarray, axis=axis, skipna=skipna, mask=self.isna())
 
@@ -2148,7 +2146,7 @@ class TimelikeOps(DatetimeLikeArrayMixin):
 def ensure_arraylike_for_datetimelike(data, copy: bool, cls_name: str):
     if not hasattr(data, "dtype"):
         # e.g. list, tuple
-        if np.ndim(data) == 0:
+        if not isinstance(data, (list, tuple)) and np.ndim(data) == 0:
             # i.e. generator
             data = list(data)
         data = np.asarray(data)
