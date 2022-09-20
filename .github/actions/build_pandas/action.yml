@@ -12,8 +12,7 @@ runs:
 
     - name: Build Pandas
       run: |
-        # TODO: uncomment this after meson/meson-python bugs patched
-        python -m pip install . --no-build-isolation
+        python -m pip install . --no-build-isolation -v
       shell: bash -el {0}
 #      env:
 #        # Cannot use parallel compilation on Windows, see https://github.com/pandas-dev/pandas/issues/30873
