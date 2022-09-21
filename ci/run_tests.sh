@@ -1,5 +1,10 @@
 #!/bin/bash -e
 
+# Meson can't build inplace, we need to cd out of the pandas directory
+# to test
+cd ..
+PYTEST_TARGET="pandas/$PYTEST_TARGET"
+
 # Workaround for pytest-xdist (it collects different tests in the workers if PYTHONHASHSEED is not set)
 # https://github.com/pytest-dev/pytest/issues/920
 # https://github.com/pytest-dev/pytest/issues/1075
@@ -33,7 +38,7 @@ fi
 echo $PYTEST_CMD
 sh -c "$PYTEST_CMD"
 
-if [[ "$PANDAS_DATA_MANAGER" != "array" && "$PYTEST_TARGET" == "pandas" ]]; then
+if [[ "$PANDAS_DATA_MANAGER" != "array" && "$PYTEST_TARGET" == "pandas/pandas" ]]; then
     # The ArrayManager tests should have already been run by PYTEST_CMD if PANDAS_DATA_MANAGER was already set to array
     # If we're targeting specific files, e.g. test_downstream.py, don't run.
     PYTEST_AM_CMD="PANDAS_DATA_MANAGER=array pytest -n $PYTEST_WORKERS --dist=loadfile $TEST_ARGS $COVERAGE pandas"
