@@ -19,9 +19,9 @@ runs:
     - name: Build Pandas (Windows)
       if: ${{ runner.os == 'Windows' }}
       run: |
-        call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build"
+        call "C:\Program Files\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvars64.bat"
         python -m pip install . --no-build-isolation -v
-      shell: cmd
+      shell: cmd /C call {0}
 #      env:
 #        # Cannot use parallel compilation on Windows, see https://github.com/pandas-dev/pandas/issues/30873
 #        # GH 47305: Parallel build causes flaky ImportError: /home/runner/work/pandas/pandas/pandas/_libs/tslibs/timestamps.cpython-38-x86_64-linux-gnu.so: undefined symbol: pandas_datetime_to_datetimestruct
