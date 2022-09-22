@@ -1,9 +1,5 @@
 #!/bin/bash -e
 
-# Meson can't build inplace, we need to cd out of the pandas directory
-# to test
-cd ..
-PYTEST_TARGET="pandas/$PYTEST_TARGET"
 
 # Workaround for pytest-xdist (it collects different tests in the workers if PYTHONHASHSEED is not set)
 # https://github.com/pytest-dev/pytest/issues/920
@@ -29,7 +25,7 @@ if [[ $(uname) == "Linux" && -z $DISPLAY ]]; then
     XVFB="xvfb-run "
 fi
 
-PYTEST_CMD="${XVFB}pytest -r fEs -n $PYTEST_WORKERS --dist=loadfile $TEST_ARGS $COVERAGE $PYTEST_TARGET"
+PYTEST_CMD="${XVFB}pytest -r fEs -n $PYTEST_WORKERS --dist=loadfile --import-mode=append $TEST_ARGS $COVERAGE $PYTEST_TARGET"
 
 if [[ "$PATTERN" ]]; then
   PYTEST_CMD="$PYTEST_CMD -m \"$PATTERN\""
