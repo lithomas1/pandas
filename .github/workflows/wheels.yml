@@ -99,7 +99,7 @@ jobs:
           path: ./wheelhouse/*.whl
 
       - name: Install anaconda client
-        if: ${{ success() && (IS_SCHEDULE_DISPATCH == 'true' || IS_PUSH == 'true') }}
+        if: ${{ success() && (env.IS_SCHEDULE_DISPATCH == 'true' || env.IS_PUSH == 'true') }}
         run: |
           conda install -q -y anaconda-client
 
