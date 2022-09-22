@@ -83,8 +83,9 @@ jobs:
           CIBW_BUILD_VERBOSITY: 3
 
       # Used to push the built wheels
-      - uses: actions/setup-python@v3
+      - uses: conda-incubator/setup-miniconda@v2
         with:
+          auto-update-conda: true
           python-version: ${{ matrix.python[1] }}
 
       - name: Test wheels (Windows 64-bit only)
@@ -141,11 +142,13 @@ jobs:
           # A shallow clone can work when the following issue is resolved:
           # https://github.com/actions/checkout/issues/338
           fetch-depth: 0
-      # Used to push the built wheels
-      - uses: actions/setup-python@v3
+
+      # Used to push the built sdist
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          # Build sdist on lowest supported Python
-          python-version: '3.8'
+          auto-update-conda: true
+          python-version: '3.8' # Build on lowest supported version
+
       - name: Build sdist
         run: |
           pip install build
@@ -166,6 +169,11 @@ jobs:
         with:
           name: sdist
           path: ./dist/*
+      
+      - name: Install anaconda client
+        if: ${{ success() && (env.IS_SCHEDULE_DISPATCH == 'true' || env.IS_PUSH == 'true') }}
+        run: |
+          conda install -q -y anaconda-client
 
       - name: Upload sdist
         if: success()
