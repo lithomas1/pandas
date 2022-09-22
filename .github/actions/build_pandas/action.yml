@@ -13,7 +13,7 @@ runs:
     - name: Build Pandas
       if : ${{ runner.os != 'Windows' }}
       run: |
-        python -m pip install . --no-build-isolation -v
+        pip install . --no-build-isolation -v
       shell: bash -el {0}
 
     - name: Build Pandas (Windows)
