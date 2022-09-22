@@ -2,11 +2,11 @@
 project(
     'pandas',
     'c', 'cpp', 'cython',
-    version: '1.5.0.dev0',
+    version: '1.6.0.dev0',
     license: 'BSD-3',
     meson_version: '>=0.63',
     default_options: [
-        'buildtype=debugoptimized',
+        'buildtype=release',
         'c_std=c99'
     ]
 )
