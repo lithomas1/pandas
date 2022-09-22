@@ -56,7 +56,7 @@ jobs:
     env:
       IS_32_BIT: ${{ matrix.buildplat[1] == 'win32' }}
       IS_PUSH: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
-      IS_SCHEDULE_DISPATCH: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
+      IS_SCHEDULE_DISPATCH: true #${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     steps:
       - name: Checkout pandas
         uses: actions/checkout@v3
@@ -97,6 +97,11 @@ jobs:
         with:
           name: ${{ matrix.python[0] }}-${{ startsWith(matrix.buildplat[1], 'macosx') && 'macosx' || matrix.buildplat[1] }}
           path: ./wheelhouse/*.whl
+
+      - name: Install anaconda client
+        if: ${{ success() && (IS_SCHEDULE_DISPATCH == 'true' || IS_PUSH == 'true') }}
+        run: |
+          conda install -q -y anaconda-client
 
       - name: Upload wheels
         if: success()
