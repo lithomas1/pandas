@@ -82,10 +82,9 @@ jobs:
           CIBW_ARCHS_MACOS: x86_64 universal2
           CIBW_BUILD_VERBOSITY: 3
 
-      # Used to push the built wheels
-      - uses: conda-incubator/setup-miniconda@v2
+      # Used to test the built wheels
+      - uses: actions/setup-python@v3
         with:
-          auto-update-conda: true
           python-version: ${{ matrix.python[1] }}
 
       - name: Test wheels (Windows 64-bit only)
@@ -98,6 +97,16 @@ jobs:
         with:
           name: ${{ matrix.python[0] }}-${{ startsWith(matrix.buildplat[1], 'macosx') && 'macosx' || matrix.buildplat[1] }}
           path: ./wheelhouse/*.whl
+          
+      # Used to push the built wheels
+      # TODO: once Python 3.11 is available on conda, de-dup with
+      # setup python above
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          # Really doesn't matter what version we upload with
+          # just the version we test with
+          python-version: '3.8'
 
       - name: Install anaconda client
         if: ${{ success() && (env.IS_SCHEDULE_DISPATCH == 'true' || env.IS_PUSH == 'true') }}
