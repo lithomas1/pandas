@@ -163,6 +163,7 @@ jobs:
           pip install build
           python -m build --sdist
       - name: Test the sdist
+        shell: bash -el {0}
         run: |
           # TODO: Don't run test suite, and instead build wheels from sdist
           # by splitting the wheel builders into a two stage job
@@ -171,8 +172,6 @@ jobs:
           python -m pip install dist/*.gz
           pip install hypothesis==6.52.1 pytest>=6.2.5 pytest-xdist pytest-asyncio>=0.17
           cd .. # Not a good idea to test within the src tree
-          # Uninstall jinja2, why is there an old version coming with the default Miniconda python?
-          pip uninstall Jinja2
           python -c "import pandas; print(pandas.__version__);
           pandas.test(extra_args=['-m not clipboard and not single_cpu', '--skip-slow', '--skip-network', '--skip-db', '-n=2']);
           pandas.test(extra_args=['-m not clipboard and single_cpu', '--skip-slow', '--skip-network', '--skip-db'])"
