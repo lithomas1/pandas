@@ -179,7 +179,9 @@ from pandas.util._tester import test
 from pandas._version import get_versions
 
 v = get_versions()
-__version__ = v.get("closest-tag", v["version"])
+# __version__ = v.get("closest-tag", v["version"])
+# TODO: Don't hardcode this and actually figure out how to do this
+__version__ = "1.6.0"
 __git_version__ = v.get("full-revisionid")
 del get_versions, v
 
