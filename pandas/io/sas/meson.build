@@ -3,6 +3,9 @@ py.extension_module(
     ['sas.pyx'],
     include_directories: [inc_np],
     dependencies: [py_dep],
+    # The file is named sas.pyx but we want the
+    # extension module to be named _sas
+    cython_args: ['--module-name=pandas.io.sas._sas'],
     subdir: 'pandas/io/sas',
     install: true
 )
