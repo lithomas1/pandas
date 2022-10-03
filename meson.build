@@ -15,5 +15,16 @@ py_mod = import('python')
 py = py_mod.find_installation('python')
 py_dep = py.dependency()
 tempita = files('generate_pxi.py')
+versioneer = files('generate_version.py')
 
+custom_target('write_version_file',
+    output: '_version_meson.py',
+    command: [
+        py, versioneer, '-o', '@OUTPUT@'
+    ],
+    build_by_default: true,
+    build_always_stale: true,
+    install: true,
+    install_dir: py.get_install_dir(pure: false) / 'pandas'
+)
 subdir('pandas')
