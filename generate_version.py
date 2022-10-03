@@ -5,8 +5,10 @@ import versioneer
 
 def write_version_info(path):
     with open(path, "w") as file:
-        file.write(f"__version__={versioneer.get_version()}\n")
-        file.write(f'__git__version__={versioneer.get_versions()["full-revisionid"]}\n')
+        file.write(f'__version__="{versioneer.get_version()}"\n')
+        file.write(
+            f'__git__version__="{versioneer.get_versions()["full-revisionid"]}"\n'
+        )
 
 
 def main():
