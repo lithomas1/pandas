@@ -17,6 +17,7 @@ py_dep = py.dependency()
 tempita = files('generate_pxi.py')
 versioneer = files('generate_version.py')
 
+# TODO: Think about how this would work for an sdist
 custom_target('write_version_file',
     output: '_version_meson.py',
     command: [
@@ -27,4 +28,5 @@ custom_target('write_version_file',
     install: true,
     install_dir: py.get_install_dir(pure: false) / 'pandas'
 )
+
 subdir('pandas')
