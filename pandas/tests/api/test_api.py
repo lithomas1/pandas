@@ -316,8 +316,14 @@ class TestTesting(Base):
         assert "pandas.util.testing is deprecated" in str(m[0].message)
         assert "pandas.testing instead" in str(m[0].message)
 
-    def test_util_in_top_level(self):
+    def test_util_in_top_level(self, monkeypatch):
         # in a subprocess to avoid import caching issues
+
+        # Can't import pandas from the test directory since its not
+        # built inplace with meson
+        if pd.__built_with_meson:
+            monkeypatch.chdir("..")
+
         out = subprocess.check_output(
             [
                 sys.executable,

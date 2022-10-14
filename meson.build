@@ -19,7 +19,7 @@ versioneer = files('generate_version.py')
 
 # TODO: Think about how this would work for an sdist
 custom_target('write_version_file',
-    output: '_version_meson.py',
+    output: '__version_meson.py',
     command: [
         py, versioneer, '-o', '@OUTPUT@'
     ],
