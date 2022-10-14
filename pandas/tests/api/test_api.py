@@ -29,7 +29,7 @@ class Base:
 class TestPDApi(Base):
     # these are optionally imported based on testing
     # & need to be ignored
-    ignored = ["tests", "locale", "conftest"]
+    ignored = ["tests", "locale", "conftest", "_version_meson"]
 
     # top-level sub-packages
     public_lib = [
@@ -43,7 +43,7 @@ class TestPDApi(Base):
         "io",
         "tseries",
     ]
-    private_lib = ["compat", "core", "pandas", "util"]
+    private_lib = ["compat", "core", "pandas", "util", "_built_with_meson"]
 
     # these are already deprecated; awaiting removal
     deprecated_modules: list[str] = ["np", "datetime"]
@@ -321,7 +321,7 @@ class TestTesting(Base):
 
         # Can't import pandas from the test directory since its not
         # built inplace with meson
-        if pd.__built_with_meson:
+        if pd._built_with_meson:
             monkeypatch.chdir("..")
 
         out = subprocess.check_output(

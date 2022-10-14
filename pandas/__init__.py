@@ -176,11 +176,11 @@ from pandas.io.json import _json_normalize as json_normalize
 from pandas.util._tester import test
 
 # use the closest tagged version if possible
-__built_with_meson = False
+_built_with_meson = False
 try:
-    from pandas.__version_meson import __version__, __git_version__
+    from pandas._version_meson import __version__, __git_version__
 
-    __built_with_meson = True
+    _built_with_meson = True
 except ImportError:
     from pandas._version import get_versions
 
@@ -429,4 +429,7 @@ __all__ = [
     "unique",
     "value_counts",
     "wide_to_long",
+    # TODO: remove this when meson becomes the default
+    # build system
+    "_built_with_meson",
 ]

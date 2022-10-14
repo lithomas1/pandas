@@ -18,7 +18,7 @@ from pandas import (
     PeriodIndex,
     Series,
     Timestamp,
-    __built_with_meson,
+    _built_with_meson,
     arrays,
     date_range,
 )
@@ -50,7 +50,7 @@ def test_registry_mpl_resets(monkeypatch):
     # Check that Matplotlib converters are properly reset (see issue #27481)
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if __built_with_meson:
+    if _built_with_meson:
         monkeypatch.chdir("..")
     code = (
         "import matplotlib.units as units; "
@@ -73,7 +73,7 @@ class TestRegistration:
     def test_dont_register_by_default(self, monkeypatch):
         # Can't import pandas from the test directory since its not
         # built inplace with meson
-        if __built_with_meson:
+        if _built_with_meson:
             monkeypatch.chdir("..")
         # Run in subprocess to ensure a clean state
         code = (

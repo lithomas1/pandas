@@ -137,7 +137,7 @@ def test_oo_optimizable(monkeypatch):
     # GH 21071
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if pd.__built_with_meson:
+    if pd._built_with_meson:
         monkeypatch.chdir("..")
     subprocess.check_call([sys.executable, "-OO", "-c", "import pandas"])
 
@@ -146,7 +146,7 @@ def test_oo_optimized_datetime_index_unpickle(monkeypatch):
     # GH 42866
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if pd.__built_with_meson:
+    if pd._built_with_meson:
         monkeypatch.chdir("..")
     subprocess.check_call(
         [
@@ -298,7 +298,7 @@ def test_missing_required_dependency(monkeypatch):
 
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if pd.__built_with_meson:
+    if pd._built_with_meson:
         monkeypatch.chdir("..")
     call = [pyexe, "-c", "import pandas;print(pandas.__file__)"]
     output = subprocess.check_output(call).decode()
