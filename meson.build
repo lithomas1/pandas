@@ -12,21 +12,26 @@ project(
 )
 
 py_mod = import('python')
+fs = import('fs')
 py = py_mod.find_installation('python')
 py_dep = py.dependency()
 tempita = files('generate_pxi.py')
 versioneer = files('generate_version.py')
 
-# TODO: Think about how this would work for an sdist
-custom_target('write_version_file',
-    output: '__version_meson.py',
-    command: [
-        py, versioneer, '-o', '@OUTPUT@'
-    ],
-    build_by_default: true,
-    build_always_stale: true,
-    install: true,
-    install_dir: py.get_install_dir(pure: false) / 'pandas'
-)
+if fs.exists('_version_meson.py')
+    py.install_sources('_version_meson.py', subdir: 'pandas')
+else
+    custom_target('write_version_file',
+        output: '_version_meson.py',
+        command: [
+            py, versioneer, '-o', '@OUTPUT@'
+        ],
+        build_by_default: true,
+        build_always_stale: true,
+        install: true,
+        install_dir: py.get_install_dir(pure: false) / 'pandas'
+    )
+    meson.add_dist_script(py, versioneer, '-o', '_version_meson.py')
+endif
 
 subdir('pandas')

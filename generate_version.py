@@ -1,9 +1,13 @@
 import argparse
+import os
 
 import versioneer
 
 
 def write_version_info(path):
+    if os.environ.get("MESON_DIST_ROOT"):
+        # raise ValueError("dist root is", os.environ.get("MESON_DIST_ROOT"))
+        path = os.path.join(os.environ.get("MESON_DIST_ROOT"), path)
     with open(path, "w") as file:
         file.write(f'__version__="{versioneer.get_version()}"\n')
         file.write(
