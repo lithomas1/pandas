@@ -206,7 +206,7 @@ def test_with_missing_lzma(monkeypatch):
     # https://github.com/pandas-dev/pandas/issues/27575
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if pd.__built_with_meson:
+    if pd._built_with_meson:
         monkeypatch.chdir("..")
     code = textwrap.dedent(
         """\
@@ -224,7 +224,7 @@ def test_with_missing_lzma_runtime(monkeypatch):
     """
     # Can't import pandas from the test directory since its not
     # built inplace with meson
-    if pd.__built_with_meson:
+    if pd._built_with_meson:
         monkeypatch.chdir("..")
     code = textwrap.dedent(
         """

@@ -429,7 +429,4 @@ __all__ = [
     "unique",
     "value_counts",
     "wide_to_long",
-    # TODO: remove this when meson becomes the default
-    # build system
-    "_built_with_meson",
 ]
