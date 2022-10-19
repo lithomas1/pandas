@@ -54,4 +54,4 @@ dependencies:
   - zstandard
   - pip:
       - "git+https://github.com/lithomas1/meson.git@fix-ghost-pdb-target"
-      - "git+https://github.com/lithomas1/meson-python.git@fix-install-subdirs"
+      - "git+https://github.com/FFY00/meson-python.git@main"
