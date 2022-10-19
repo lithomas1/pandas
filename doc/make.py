@@ -354,9 +354,26 @@ def main():
     # external libraries (namely Sphinx) to compile this module and resolve
     # the import of `python_path` correctly. The latter is used to resolve
     # the import within the module, injecting it into the global namespace
-    os.environ["PYTHONPATH"] = args.python_path
-    sys.path.insert(0, args.python_path)
-    globals()["pandas"] = importlib.import_module("pandas")
+
+    # Check for pandas built by meson
+    loaded_meson_pandas = False
+    try:
+        import pandas as pd
+
+        if not pd._built_with_meson:
+            # This is just a random pandas, so use the editable install of pandas
+            loaded_meson_pandas = False
+            del sys.module["pandas"]
+            del pd
+        else:
+            loaded_meson_pandas = True
+    except ImportError:
+        pass
+
+    if not loaded_meson_pandas:
+        os.environ["PYTHONPATH"] = args.python_path
+        sys.path.insert(0, args.python_path)
+        globals()["pandas"] = importlib.import_module("pandas")
 
     # Set the matplotlib backend to the non-interactive Agg backend for all
     # child processes.

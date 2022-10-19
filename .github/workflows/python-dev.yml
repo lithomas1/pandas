@@ -90,7 +90,8 @@ jobs:
 
     - name: Build Version
       run: |
-        python -c "import pandas; pandas.show_versions();"
+        # Can't import pandas from the source directory
+        cd .. && python -c "import pandas; pandas.show_versions();"
 
     - name: Test
       uses: ./.github/actions/run-tests
