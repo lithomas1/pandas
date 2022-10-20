@@ -362,11 +362,11 @@ def main():
 
         if not pd._built_with_meson:
             # This is just a random pandas, so use the editable install of pandas
-            loaded_meson_pandas = False
-            del sys.module["pandas"]
+            del sys.modules["pandas"]
             del pd
         else:
             loaded_meson_pandas = True
+            globals()["pandas"] = pd
     except ImportError:
         pass
 
