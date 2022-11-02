@@ -50,7 +50,6 @@ dependencies:
   - xarray
   - xlrd
   - xlsxwriter
-  - xlwt
   - zstandard
   - pip:
       - "git+https://github.com/mesonbuild/meson.git@master"
