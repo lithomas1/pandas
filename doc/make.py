@@ -27,6 +27,7 @@ DOC_PATH = os.path.dirname(os.path.abspath(__file__))
 SOURCE_PATH = os.path.join(DOC_PATH, "source")
 BUILD_PATH = os.path.join(DOC_PATH, "build")
 REDIRECTS_FILE = os.path.join(DOC_PATH, "redirects.csv")
+pandas_built_with_meson = False
 
 
 class DocBuilder:
@@ -145,7 +146,11 @@ class DocBuilder:
             SOURCE_PATH,
             os.path.join(BUILD_PATH, kind),
         ]
-        return subprocess.call(cmd)
+        if pandas_built_with_meson:
+            cwd = DOC_PATH
+        else:
+            cwd = None
+        return subprocess.call(cmd, cwd=cwd)
 
     def _open_browser(self, single_doc_html):
         """
@@ -291,6 +296,8 @@ class DocBuilder:
 
 
 def main():
+    global pandas_built_with_meson
+
     cmds = [method for method in dir(DocBuilder) if not method.startswith("_")]
 
     joined = ",".join(cmds)
@@ -356,7 +363,6 @@ def main():
     # the import within the module, injecting it into the global namespace
 
     # Check for pandas built by meson
-    loaded_meson_pandas = False
     try:
         import pandas as pd
 
@@ -365,12 +371,12 @@ def main():
             del sys.modules["pandas"]
             del pd
         else:
-            loaded_meson_pandas = True
+            pandas_built_with_meson = True
             globals()["pandas"] = pd
     except ImportError:
         pass
 
-    if not loaded_meson_pandas:
+    if not pandas_built_with_meson:
         os.environ["PYTHONPATH"] = args.python_path
         sys.path.insert(0, args.python_path)
         globals()["pandas"] = importlib.import_module("pandas")
