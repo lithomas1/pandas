@@ -137,7 +137,7 @@ class DocBuilder:
         if self.num_jobs:
             cmd += ["-j", "1"]  # self.num_jobs]
         if self.warnings_are_errors:
-            cmd += ["-W", "--keep-going", "-T", "-v"]
+            cmd += ["-W", "--keep-going", "-T", "-vvv"]
         if self.verbosity:
             cmd.append(f"-{'v' * self.verbosity}")
         cmd += [
