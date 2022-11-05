@@ -27,7 +27,6 @@ DOC_PATH = os.path.dirname(os.path.abspath(__file__))
 SOURCE_PATH = os.path.join(DOC_PATH, "source")
 BUILD_PATH = os.path.join(DOC_PATH, "build")
 REDIRECTS_FILE = os.path.join(DOC_PATH, "redirects.csv")
-pandas_built_with_meson = False
 
 
 class DocBuilder:
@@ -135,9 +134,9 @@ class DocBuilder:
 
         cmd = ["sphinx-build", "-b", kind]
         if self.num_jobs:
-            cmd += ["-j", "1"]  # self.num_jobs]
+            cmd += ["-j", self.num_jobs]
         if self.warnings_are_errors:
-            cmd += ["-W", "--keep-going", "-T", "-v"]
+            cmd += ["-W", "--keep-going"]
         if self.verbosity:
             cmd.append(f"-{'v' * self.verbosity}")
         cmd += [
@@ -146,11 +145,7 @@ class DocBuilder:
             SOURCE_PATH,
             os.path.join(BUILD_PATH, kind),
         ]
-        if pandas_built_with_meson:
-            cwd = DOC_PATH
-        else:
-            cwd = None
-        return subprocess.call(cmd, cwd=cwd)
+        return subprocess.call(cmd)
 
     def _open_browser(self, single_doc_html):
         """
@@ -296,8 +291,6 @@ class DocBuilder:
 
 
 def main():
-    global pandas_built_with_meson
-
     cmds = [method for method in dir(DocBuilder) if not method.startswith("_")]
 
     joined = ",".join(cmds)
@@ -361,25 +354,9 @@ def main():
     # external libraries (namely Sphinx) to compile this module and resolve
     # the import of `python_path` correctly. The latter is used to resolve
     # the import within the module, injecting it into the global namespace
-
-    # Check for pandas built by meson
-    try:
-        import pandas as pd
-
-        if not pd._built_with_meson:
-            # This is just a random pandas, so use the editable install of pandas
-            del sys.modules["pandas"]
-            del pd
-        else:
-            pandas_built_with_meson = True
-            globals()["pandas"] = pd
-    except ImportError:
-        pass
-
-    if not pandas_built_with_meson:
-        os.environ["PYTHONPATH"] = args.python_path
-        sys.path.insert(0, args.python_path)
-        globals()["pandas"] = importlib.import_module("pandas")
+    # os.environ["PYTHONPATH"] = args.python_path
+    # sys.path.insert(0, args.python_path)
+    globals()["pandas"] = importlib.import_module("pandas")
 
     # Set the matplotlib backend to the non-interactive Agg backend for all
     # child processes.
