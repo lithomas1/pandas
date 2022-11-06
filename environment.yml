@@ -79,8 +79,8 @@ dependencies:
   - asv
 
   # The compiler packages are meta-packages and install the correct compiler (activation) packages on the respective platforms.
-  - c-compiler
-  - cxx-compiler
+  #- c-compiler
+  #- cxx-compiler
 
   # code checks
   - black=22.3.0
