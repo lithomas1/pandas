@@ -116,14 +116,14 @@ dependencies:
   - nbformat
   - notebook>=6.0.3
   - ipykernel
-#
-#  # web
-#  - jinja2  # in optional dependencies, but documented here as needed
-#  - markdown
-#  - feedparser
-#  - pyyaml
-#  - requests
-#
+
+  # web
+  - jinja2  # in optional dependencies, but documented here as needed
+  - markdown
+  - feedparser
+  - pyyaml
+  - requests
+
   # build the interactive terminal
   - jupyterlab >=3.4,<4
   - pip:
