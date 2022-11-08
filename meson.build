@@ -13,6 +13,9 @@ project(
     ]
 )
 
+add_global_arguments('-DNPY_NO_DEPRECATED_API=0', language : 'c')
+add_global_arguments('-DNPY_NO_DEPRECATED_API=0', language : 'cpp')
+
 py_mod = import('python')
 fs = import('fs')
 py = py_mod.find_installation('python')
