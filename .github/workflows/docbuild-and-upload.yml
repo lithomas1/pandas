@@ -45,6 +45,11 @@ jobs:
     - name: Build Pandas
       uses: ./.github/actions/build_pandas
 
+    - name: Build Version
+      run: |
+        # Can't import pandas from the source directory
+        cd .. && python -c "import pandas; pandas.show_versions();"
+
     - name: Build website
       run: python web/pandas_web.py web/pandas --target-path=web/build
 
