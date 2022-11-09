@@ -54,7 +54,7 @@ jobs:
       run: python web/pandas_web.py web/pandas --target-path=web/build
 
     - name: Build documentation
-      run: cd doc && PYTHONFAULTHANDLER=1 python make.py --num-jobs 1 -vv #--warnings-are-errors
+      run: cd doc && catchsegv PYTHONFAULTHANDLER=1 python make.py --num-jobs 1 -vv #--warnings-are-errors
 
     - name: Build documentation zip
       run: cd doc && python make.py zip_html

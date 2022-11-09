@@ -8,7 +8,7 @@ project(
     # we are relying on 0.64.0 features
     meson_version: '>=0.63',
     default_options: [
-        'buildtype=release',
+        'buildtype=debug',
         'c_std=c99'
     ]
 )
