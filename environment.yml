@@ -107,6 +107,7 @@ dependencies:
   - types-python-dateutil
   - types-PyMySQL
   - types-pytz
+  - types-setuptools
 
   # documentation (jupyter notebooks)
   - nbconvert>=6.4.5

@@ -12,7 +12,8 @@ project(
         # when buildtype = debug, this seems to be causing problems on CI
         # where provided Python is not compiled in debug mode
         'buildtype=release',
-        'werror=true',
+        # TODO: turn on werror when ready
+        #'werror=true',
         # TODO: We are using POSIX functions(strdup in ujson), so we can't compile
         # with strict C99 :(
         #'c_std=c99'
