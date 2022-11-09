@@ -9,7 +9,7 @@ project(
     meson_version: '>=0.63',
     default_options: [
         'buildtype=debug',
-        'c_std=c99'
+        #'c_std=c99'
     ]
 )
 
