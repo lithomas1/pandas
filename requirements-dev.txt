@@ -100,4 +100,4 @@ jupyterlab >=3.4,<4
 jupyterlite==0.1.0b12
 sphinx-toggleprompt
 git+https://github.com/mesonbuild/meson.git@master
-git+https://github.com/FFY00/meson-python.git@main
+git+https://github.com/mesonbuild/meson-python.git@main

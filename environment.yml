@@ -77,11 +77,11 @@ dependencies:
 
   # benchmarks
   - asv
-#
-#  # The compiler packages are meta-packages and install the correct compiler (activation) packages on the respective platforms.
-#  - c-compiler
-#  - cxx-compiler
-#
+
+  # The compiler packages are meta-packages and install the correct compiler (activation) packages on the respective platforms.
+  - c-compiler
+  - cxx-compiler
+
   # code checks
   - black=22.3.0
   - cpplint
@@ -130,4 +130,4 @@ dependencies:
       - jupyterlite==0.1.0b12
       - sphinx-toggleprompt
       - "git+https://github.com/mesonbuild/meson.git@master"
-      - "git+https://github.com/FFY00/meson-python.git@main"
+      - "git+https://github.com/mesonbuild/meson-python.git@main"

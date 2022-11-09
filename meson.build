@@ -8,7 +8,11 @@ project(
     # we are relying on 0.64.0 features
     meson_version: '>=0.63',
     default_options: [
-        'buildtype=debug',
+        # TODO: investigate, does meson try to compile against debug Python
+        # when buildtype = debug, this seems to be causing problems on CI
+        # where provided Python is not compiled in debug mode
+        'buildtype=release',
+        'werror=true',
         # TODO: We are using POSIX functions(strdup in ujson), so we can't compile
         # with strict C99 :(
         #'c_std=c99'
