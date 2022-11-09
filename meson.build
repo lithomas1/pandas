@@ -9,6 +9,8 @@ project(
     meson_version: '>=0.63',
     default_options: [
         'buildtype=debug',
+        # TODO: We are using POSIX functions(strdup in ujson), so we can't compile
+        # with strict C99 :(
         #'c_std=c99'
     ]
 )
