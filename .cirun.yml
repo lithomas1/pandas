@@ -7,7 +7,7 @@ runners:
     # By default openstack provides cirros image
     # To build custom image check the custom image docs
     # This image is not suitable for jobs to be performed by runner, refer to custom image docs and create a new image first
-    machine_image: "Ubuntu 22.10"
+    machine_image: "pandas-web-backup"
     # preemptible instances not supported
     # Add this label in the "runs-on" param in .github/workflows/<workflow-name>.yml
     # So that this runner is created for running the workflow
