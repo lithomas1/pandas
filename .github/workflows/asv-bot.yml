@@ -61,7 +61,7 @@ jobs:
         run: |
           # extracting the regex, see https://stackoverflow.com/a/36798723
           #REGEX=$(echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p")
-          REGEX='*'
+          REGEX='^tslibs'
           cd asv_bench
           asv check -E existing
           git remote add upstream https://github.com/pandas-dev/pandas.git
