@@ -43,6 +43,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install curl and tar
+        run: |
+          sudo apt update
+          sudo apt install curl
+          curl --version
+
         # Although asv sets up its own env, deps are still needed
         # during discovery process
       - name: Set up Conda
