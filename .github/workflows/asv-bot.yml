@@ -79,7 +79,6 @@ jobs:
           #REGEX=$(echo "$COMMENT" | sed -n "s/^.*-b\s*\(\S*\).*$/\1/p")
           REGEX='^tslibs'
           cd asv_bench
-          asv check
           git remote add upstream https://github.com/pandas-dev/pandas.git
           git fetch upstream
           asv machine --yes
