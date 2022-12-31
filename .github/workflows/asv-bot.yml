@@ -58,11 +58,17 @@ jobs:
           python-version: 3.8
           miniconda-version: "latest"
       
-      - name: Install ASV
+      - name: Install Dependencies
         shell: bash -el {0}
         run: |
           pip install asv
           pip install numpy
+          
+      
+      - name: Build pandas
+        shell: bash -el {0}
+        run: |
+          python -m pip install -e . --no-build-isolation
 
       - name: Run benchmarks
         id: bench
