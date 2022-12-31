@@ -55,15 +55,17 @@ jobs:
       - uses: conda-incubator/setup-miniconda@v2
         with:
           auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.8
           miniconda-version: "latest"
       
       - name: Install ASV
+        shell: bash -el {0}
         run: |
           pip install asv
 
       - name: Run benchmarks
         id: bench
+        shell: bash -el {0}
         continue-on-error: true # This is a fake failure, asv will exit code 1 for regressions
         run: |
           # extracting the regex, see https://stackoverflow.com/a/36798723
