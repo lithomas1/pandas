@@ -62,8 +62,7 @@ jobs:
         shell: bash -el {0}
         run: |
           pip install asv
-          pip install numpy
-          
+          pip install numpy versioneer[toml] python-dateutil pytz
       
       - name: Build pandas
         shell: bash -el {0}
