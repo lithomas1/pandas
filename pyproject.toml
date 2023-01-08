@@ -460,3 +460,10 @@ directory = "coverage_html_report"
 [tool.codespell]
 ignore-words-list = "blocs, coo, hist, nd, sav, ser, recuse"
 ignore-regex = 'https://([\w/\.])+'
+
+[tool.devpy]
+package = 'pandas'
+
+[tool.devpy.commands]
+"Build" = ["devpy.build", "devpy.test"]
+"Environments" = ["devpy.shell", "devpy.ipython", "devpy.python"]

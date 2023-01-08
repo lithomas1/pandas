@@ -43,6 +43,7 @@ MANIFEST
 ################
 # setup.py working directory
 build
+build-install
 # sphinx build directory
 doc/_build
 # setup.py dist directory
