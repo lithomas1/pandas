@@ -10,9 +10,9 @@ dependencies:
   - cython>=0.29.32
 
   # test dependencies
-  - pytest>=6.0
+  - pytest>=7.0.0
   - pytest-cov
-  - pytest-xdist>=1.31
+  - pytest-xdist>=2.2.0
   - psutil
   - pytest-asyncio>=0.17
   - boto3
@@ -40,7 +40,7 @@ dependencies:
   - openpyxl
   - odfpy
   - psycopg2
-  - pyarrow<10
+  - pyarrow
   - pymysql
   - pyreadstat
   - pytables
@@ -48,7 +48,7 @@ dependencies:
   - pyxlsb
   - s3fs>=2021.08.0
   - scipy
-  - sqlalchemy
+  - sqlalchemy<1.4.46
   - tabulate
   - xarray
   - xlrd
@@ -56,7 +56,6 @@ dependencies:
   - zstandard
 
   # downstream packages
-  - aiobotocore
   - botocore
   - cftime
   - dask
