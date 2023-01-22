@@ -58,8 +58,6 @@ jobs:
           auto-update-conda: true
           python-version: 3.8
           miniconda-version: "latest"
-          auto-activate-base: true
-          activate-environment: ""
           
       - name: Configure conda to use the mamba solver
         run: |
