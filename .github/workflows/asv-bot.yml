@@ -58,6 +58,13 @@ jobs:
           auto-update-conda: true
           python-version: 3.8
           miniconda-version: "latest"
+          auto-activate-base: true
+          activate-environment: ""
+          
+      - name: Configure conda to use the mamba solver
+        run: |
+          conda install -n base conda-libmamba-solver
+          conda config --set solver libmamba
       
       - name: Install Dependencies
         shell: bash -el {0}
