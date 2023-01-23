@@ -70,10 +70,10 @@ jobs:
           pip install asv
           pip install numpy versioneer[toml] python-dateutil pytz Cython
       
-      - name: Build pandas
-        shell: bash -el {0}
-        run: |
-          python -m pip install -e . --no-build-isolation
+#       - name: Build pandas
+#         shell: bash -el {0}
+#         run: |
+#           python -m pip install -e . --no-build-isolation
 
       - name: Run benchmarks
         id: bench
