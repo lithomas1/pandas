@@ -26,6 +26,9 @@ This PDEP proposes that:
 - The ``copy`` parameter will also be removed, except in constructors and in functions/methods that convert array-likes
   to pandas objects (e.g. the ``pandas.array`` function) and functions/methods that export pandas objects to other data
   types (e.g. ``DataFrame/Series.to_numpy`` method).
+    - Note: This deprecation is conditional of the fact that Copy-on-Write becomes the default. In the event that
+      Copy-on-Write[^1] does not become the default, this deprecation will not be executed, and all deprecation
+      warnings would be reverted.
 - Open Questions
   (These questions are deferred to a later revision, and will not affect the acceptance process of this PDEP.)
     - Should ``inplace=True`` return the original pandas object that was operated inplace on?
@@ -222,19 +225,10 @@ methods.
 
 #### With `inplace=True`, should we silently copy or raise an error if the data has references?
 
-For those methods where we would keep the `inplace=True` option, there is a complication that actually operating inplace
-is not always possible.
+For those methods that would keep `inplace=True` in this PDEP, sometimes operating inplace is not possible, even
+if `inplace=True` is passed in, because the underlying data shares reference with another pandas object.
 
-For example,
-
-    :::python
-    df = pd.DataFrame({"foo": [1, 2, 3]})
-    df.replace(to_replace=1, value=100, inplace=True)
-
-can be performed inplace.
-
-This is only true if `df` does not share the values it stores with another pandas object. For example, the following
-operations
+For example, the following operation
 
     :::python
     df = pd.DataFrame({"foo": [1, 2, 3]})
@@ -246,15 +240,15 @@ would be incompatible with the Copy-on-Write rules when actually done inplace. I
 
 - copy the shared values before performing the operation to avoid modifying another object (i.e. follow the standard
   Copy-on-Write procedure),
-- raise an error to indicate that more than one object would be changed and the inplace operation is not possible.
+- raise or warn to indicate that more than one object would be changed and the inplace operation is not possible.
 
-Raising an error here is problematic since oftentimes users do not have control over whether a method would cause a "
-lazy copy" to be triggered under Copy-on-Write. It is also hard to fix, adding a `copy()` before calling a method
+Raising an error here is problematic since oftentimes users cannot control whether a method would cause a 
+"lazy copy" to be triggered under Copy-on-Write. It is also hard to fix, adding a `copy()` before calling a method
 with `inplace=True` might actually be worse than triggering the copy under the hood. We would only copy columns that
 share data with another object, not the whole object like `.copy()` would.
 
-There is another possible variant, which would be to trigger the copy (like the first option), but have an option to
-raise a warning whenever this happens.
+There is another possible variant, which would be to trigger the copy, but have an option to raise 
+a warning whenever this happens.
 This would be useful in an IPython shell/Jupyter Notebook setting, where the user would have the opportunity to delete
 unused references that are causing the copying to be triggered.
 
@@ -318,18 +312,6 @@ Disadvantages:
 Given that `inplace` is already widely used by the pandas community, we would like to collect feedback about what the
 expected return type should be. Therefore, we will defer a decision on this until a later revision of this PDEP.
 
-## Backward compatibility
-
-Removing the `inplace` keyword is a breaking change, but since the affected behaviour is `inplace=True`, the default
-behaviour when not specifying the keyword (i.e. `inplace=False`) will not change and the keyword itself can first be
-deprecated before it is removed.
-
-Similarly for the `copy` keyword, this can be deprecated before it is removed.
-
-There are some behaviour changes (for example the current `copy=False` returning a shallow copy will no longer be an "
-actual" shallow copy, but protected under Copy-on-Write), but those behaviour changes are covered by the Copy-on-Write
-proposal[^1].
-
 ## Rejected ideas
 
 ### Remove the `inplace` keyword altogether
@@ -379,10 +361,11 @@ optimization (equivalent to `copy=False`).
 Therefore, we propose deprecating the `copy` and `inplace` parameters in pandas 2.1, to
 allow for bugs with Copy-on-Write to be addressed and for more optimizations to be added.
 
-Hopefully, users will be able to switch to Copy-on-Write to keep the no-copy behavior and to silence the warnings.
-
 The full removal of the `copy` parameter and `inplace` (where necessary) is set for pandas 3.0, which will coincide
-with the enablement of Copy-on-Write for pandas by default.
+with the enablement of Copy-on-Write for pandas by default. 
+
+However, in the event that Copy-on-Write does not become the default, the deprecations for the `copy` keyword will
+be reverted, as `copy=False` would be necessary to create a shallow copy where possible (in the absence of Copy-on-Write).
 
 ## PDEP History
 
