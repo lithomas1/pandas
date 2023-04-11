@@ -77,7 +77,7 @@ jobs:
             test_args: >-
              -W error::DeprecationWarning
               -W "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning"
-              -W error::FutureWarning'
+              -W error::FutureWarning
             # TODO(cython3): Re-enable once next-beta(after beta 1) comes out
             # There are some warnings failing the build with -werror
             pandas_ci: "0"
