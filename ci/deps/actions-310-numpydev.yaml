@@ -10,8 +10,10 @@ dependencies:
 
   # test dependencies
   - pytest>=7.0.0
-  # Pin to unreleased version (pytest-cov > 4)that doesn't raise a DeprecationWarning because of rsyncdir
-  # which will cause an InternalError in pytest (b.c. of -Werror)
+  - pytest-cov
+  # Once pytest-cov > 4 comes out, unpin this
+  # Right now, a DeprecationWarning related to rsyncdir
+  # causes an InternalError within pytest
   - pytest-xdist>=2.2.0, <3
   - hypothesis>=6.34.2
   - pytest-asyncio>=0.17.0
