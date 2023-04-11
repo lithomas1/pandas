@@ -71,13 +71,7 @@ jobs:
           - name: "Numpy Dev"
             env_file: actions-310-numpydev.yaml
             pattern: "not slow and not network and not single_cpu"
-            # Deprecation warning coming from pytest-cov
-            # needs to be filtered out here to prevent pytest from failing with INTERNALERROR
-            # https://github.com/pytest-dev/pytest-xdist/issues/825#issuecomment-1292450429
-            test_args: >-
-             -W error::DeprecationWarning
-              -W "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning"
-              -W error::FutureWarning
+            test_args: "-W error::DeprecationWarning -W error::FutureWarning"
             # TODO(cython3): Re-enable once next-beta(after beta 1) comes out
             # There are some warnings failing the build with -werror
             pandas_ci: "0"
