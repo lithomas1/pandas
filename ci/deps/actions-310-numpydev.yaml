@@ -10,7 +10,9 @@ dependencies:
 
   # test dependencies
   - pytest>=7.0.0
-  - pytest-xdist>=2.2.0
+  # Pin to unreleased version (pytest-cov > 4)that doesn't raise a DeprecationWarning because of rsyncdir
+  # which will cause an InternalError in pytest (b.c. of -Werror)
+  - pytest-xdist>=2.2.0, <3
   - hypothesis>=6.34.2
   - pytest-asyncio>=0.17.0
 
@@ -22,9 +24,6 @@ dependencies:
   - pip:
     - "cython"
     - "git+https://github.com/mesonbuild/meson-python.git@e74218846ab386faa761558987064508cbf6a28e"
-    # Pin to unreleased version (pytest-cov > 4)that doesn't raise a DeprecationWarning because of rsyncdir
-    # which will cause an InternalError in pytest (b.c. of -Werror)
-    - "git+https://github.com/pytest-dev/pytest-cov.git@2ea944212d62841cbd95ce49ef4586c8450435fd"
     - "--extra-index-url https://pypi.anaconda.org/scipy-wheels-nightly/simple"
     - "--pre"
     - "numpy"
