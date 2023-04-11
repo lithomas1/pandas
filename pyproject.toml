@@ -435,6 +435,9 @@ filterwarnings = [
   "error:::pandas",
   "error::ResourceWarning",
   "error::pytest.PytestUnraisableExceptionWarning",
+  # Deprecation warning coming from pytest-cov
+  # https://github.com/pytest-dev/pytest-xdist/issues/825#issuecomment-1292450429
+  "ignore:The --rsyncdir command line argument and rsyncdirs config variable are deprecated.:DeprecationWarning",
   "ignore:.*ssl.SSLSocket:pytest.PytestUnraisableExceptionWarning",
   "ignore:.*ssl.SSLSocket:ResourceWarning",
   "ignore::ResourceWarning:asyncio",
