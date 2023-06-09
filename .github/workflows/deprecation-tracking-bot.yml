@@ -28,7 +28,7 @@ jobs:
           body = github.rest.issues.get({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            issue_number: ${DEPRECATION_TRACKER_ISSUE},
+            issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
           })["body"]
           // Add the PR number to body
           // (we always get the first linked PR)
@@ -52,14 +52,14 @@ jobs:
           github.rest.issues.update({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            issue_number: ${DEPRECATION_TRACKER_ISSUE},
+            issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
             body: body
           })
-    - name: Checkout
-      run: |
-        echo "Adding deprecation PR number to deprecation tracking issue"
-        export PR=${{ github.event.pull_request.number }}
-        BODY=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/issues/${DEPRECATION_TRACKER_ISSUE} |
-          python3 -c "import sys, json, os; x = {'body': json.load(sys.stdin)['body']}; pr = os.environ['PR']; x['body'] += f'\n- [ ] #{pr}'; print(json.dumps(x))")
-        echo ${BODY}
-        curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -X PATCH -d "${BODY}" https://api.github.com/repos/${{ github.repository }}/issues/${DEPRECATION_TRACKER_ISSUE}
+#     - name: Checkout
+#       run: |
+#         echo "Adding deprecation PR number to deprecation tracking issue"
+#         export PR=${{ github.event.pull_request.number }}
+#         BODY=$(curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" https://api.github.com/repos/${{ github.repository }}/issues/${DEPRECATION_TRACKER_ISSUE} |
+#           python3 -c "import sys, json, os; x = {'body': json.load(sys.stdin)['body']}; pr = os.environ['PR']; x['body'] += f'\n- [ ] #{pr}'; print(json.dumps(x))")
+#         echo ${BODY}
+#         curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -X PATCH -d "${BODY}" https://api.github.com/repos/${{ github.repository }}/issues/${DEPRECATION_TRACKER_ISSUE}
