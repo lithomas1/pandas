@@ -30,14 +30,13 @@ jobs:
             repo: context.repo.repo,
             issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
           })["body"]
-          // Add the PR number to body
-          // (we always get the first linked PR)
+          console.log(body);
           linkedPRs = github.rest.repos.listPullRequestsAssociatedWithCommit({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: '${{ github.sha }}'
           })
-          
+          console.log(linkedPRs);
           if (linkedPRs.length > 0) {
             console.log("Found linked PR");
             linkedPR = linkedPRs[0]
