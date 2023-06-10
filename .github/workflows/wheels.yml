@@ -10,8 +10,6 @@
 # builds.
 # The label(s) that trigger builds are:
 
-#aowefiawejfojaijwfoawefawef
-
 # - Build
 name: Wheel builder
 
