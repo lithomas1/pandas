@@ -25,13 +25,13 @@ jobs:
       id: update-deprecation-issue
       with:
         script: |
-          body = github.rest.issues.get({
+          body = await github.rest.issues.get({
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
           })["body"]
           console.log(body);
-          linkedPRs = github.rest.repos.listPullRequestsAssociatedWithCommit({
+          linkedPRs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
             owner: context.repo.owner,
             repo: context.repo.repo,
             commit_sha: '${{ github.sha }}'
