@@ -29,7 +29,9 @@ jobs:
             owner: context.repo.owner,
             repo: context.repo.repo,
             issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
-          })["body"]
+          })
+          console.log(body);
+          body = body["data"]["body"];
           console.log(body);
           linkedPRs = await github.rest.repos.listPullRequestsAssociatedWithCommit({
             owner: context.repo.owner,
@@ -37,6 +39,7 @@ jobs:
             commit_sha: '${{ github.sha }}'
           })
           console.log(linkedPRs);
+          linkedPRs = linkedPRs["data"];
           if (linkedPRs.length > 0) {
             console.log("Found linked PR");
             linkedPR = linkedPRs[0]
