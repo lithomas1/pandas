@@ -41,7 +41,7 @@ jobs:
           if (linkedPRs.length > 0) {
             linkedPR = linkedPRs[0]
             isDeprecation = false
-            for (label in linkedPR["labels"]) {
+            for (label of linkedPR["labels"]) {
               if (label["name"] == "Deprecate") {
                 isDeprecation = true;
                 break;
@@ -50,7 +50,7 @@ jobs:
 
             PR_NUMBER = linkedPR["number"];
 
-            body += ("- [ ] #" + PR_NUMBER);
+            body += ("\n- [ ] #" + PR_NUMBER);
             github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
