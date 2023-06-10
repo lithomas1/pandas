@@ -39,6 +39,7 @@ jobs:
           })
           
           if (linkedPRs.length > 0) {
+            console.log("Found linked PR");
             linkedPR = linkedPRs[0]
             isDeprecation = false
             for (label of linkedPR["labels"]) {
@@ -51,12 +52,16 @@ jobs:
             PR_NUMBER = linkedPR["number"];
 
             body += ("\n- [ ] #" + PR_NUMBER);
-            github.rest.issues.update({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
-              body: body
-            })
+            if (isDeprecation) {
+              console.log("PR is a deprecation PR. Printing new body of issue");
+              console.log(body);
+              github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ env.DEPRECATION_TRACKER_ISSUE }},
+                body: body
+              })
+            }
           }
 #     - name: Checkout
 #       run: |
