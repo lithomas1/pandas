@@ -71,7 +71,7 @@ class TestEngine:
             getattr(gb, func)(engine="numba", **kwargs)
 
     @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
+    # @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_apply_identity(self, group_keys, as_index):
         df = DataFrame({"a": [3, 2, 3, 2], "b": range(4), "c": range(1, 5)})
         gb = df.groupby("a", group_keys=group_keys, as_index=as_index)
@@ -80,7 +80,7 @@ class TestEngine:
         tm.assert_frame_equal(result, expected)
 
     @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
+    # @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_apply_transform(self, group_keys, as_index):
         def f(group):
             new_values = (group.values - group.values.mean()) / group.values.std()
@@ -93,8 +93,6 @@ class TestEngine:
 
         tm.assert_frame_equal(result, expected)
 
-    @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_apply_reduce_scalar(self, group_keys, as_index):
         df = DataFrame({"a": [3, 2, 3, 2], "b": range(4), "c": range(1, 5)})
         gb = df.groupby("a", group_keys=group_keys, as_index=as_index)
@@ -105,8 +103,6 @@ class TestEngine:
         else:
             tm.assert_series_equal(result, expected)
 
-    @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_apply_reduce_axis_0(self, group_keys, as_index):
         def f(group):
             vals = group.values.sum(axis=0)
@@ -127,8 +123,6 @@ class TestEngine:
 
         tm.assert_frame_equal(result, expected)
 
-    @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_apply_reduce_axis_1(self, group_keys, as_index):
         def f(group):
             vals = group.values.sum(axis=1)
@@ -140,8 +134,6 @@ class TestEngine:
         expected = gb.apply(lambda group: group.sum(axis=1))
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.parametrize("group_keys", [True, False])
-    @pytest.mark.parametrize("as_index", [True, False])
     def test_cython_vs_numba_expand_cols(self, group_keys, as_index):
         # Example from https://pandas.pydata.org/docs/user_guide/groupby.html#flexible-apply
         import numba

@@ -7,6 +7,8 @@ Mostly vendored from https://github.com/numba/numba/blob/main/numba/tests/pdlike
 
 from __future__ import annotations
 
+import operator
+
 import numba
 from numba.core import (
     cgutils,
@@ -18,6 +20,7 @@ from numba.core.extending import (
     box,
     lower_builtin,
     make_attribute_wrapper,
+    overload,
     register_model,
     type_callable,
     typeof_impl,
@@ -59,7 +62,8 @@ class IndexType(types.Buffer):
         return type(self)(dtype, layout, self.pyclass)
 
 
-class SeriesType(types.ArrayCompatible):
+# class SeriesType(types.ArrayCompatible):
+class SeriesType(types.Type):
     """
     The type class for Series objects.
     """
@@ -90,7 +94,8 @@ class SeriesType(types.ArrayCompatible):
         return type(self)(dtype, self.index)
 
 
-class DataFrameType(types.ArrayCompatible):
+# class DataFrameType(types.ArrayCompatible):
+class DataFrameType(types.Type):
     """
     The type class for DataFrame objects.
     """
@@ -251,20 +256,20 @@ def series_as_array(context, builder, sig, args):
     return val._get_ptr_by_name("values")
 
 
-@lower_builtin("__array_wrap__", IndexType, types.Array)
-def index_wrap_array(context, builder, sig, args):
-    dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
-    dest.data = args[1]
-    return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
-
-
-@lower_builtin("__array_wrap__", SeriesType, types.Array)
-def series_wrap_array(context, builder, sig, args):
-    src = cgutils.create_struct_proxy(sig.args[0])(value=args[0])
-    dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
-    dest.values = args[1]
-    dest.index = src.index
-    return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
+# @lower_builtin("__array_wrap__", IndexType, types.Array)
+# def index_wrap_array(context, builder, sig, args):
+#     dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
+#     dest.data = args[1]
+#     return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
+#
+#
+# @lower_builtin("__array_wrap__", SeriesType, types.Array)
+# def series_wrap_array(context, builder, sig, args):
+#     src = cgutils.create_struct_proxy(sig.args[0])(value=args[0])
+#     dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
+#     dest.values = args[1]
+#     dest.index = src.index
+#     return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
 
 
 @lower_builtin(Series, types.Array, IndexType)
@@ -424,3 +429,20 @@ def box_df(typ, val, c):
     c.pyapi.decref(columns_index_obj)
 
     return df_obj
+
+
+binops = [operator.add, operator.sub, operator.mul, operator.truediv]
+
+
+def _generate_series_binop(op):
+    def series_op(self, other):
+        if isinstance(self, SeriesType) and isinstance(other, SeriesType):
+            return lambda self, other: Series(
+                op(self.values, other.values), index=self.index
+            )
+
+    return series_op
+
+
+for op in binops:
+    overload(op)(_generate_series_binop(op))

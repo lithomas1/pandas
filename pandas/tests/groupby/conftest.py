@@ -15,6 +15,11 @@ def sort(request):
 
 
 @pytest.fixture(params=[True, False])
+def group_keys(request):
+    return request.param
+
+
+@pytest.fixture(params=[True, False])
 def as_index(request):
     return request.param
 
