@@ -26,9 +26,6 @@ This PDEP proposes that:
 - The ``copy`` parameter will also be removed, except in constructors and in functions/methods that convert array-likes
   to pandas objects (e.g. the ``pandas.array`` function) and functions/methods that export pandas objects to other data
   types (e.g. ``DataFrame/Series.to_numpy`` method).
-    - Note: This deprecation is conditional of the fact that Copy-on-Write becomes the default. In the event that
-      Copy-on-Write[^1] does not become the default, this deprecation will not be executed, and all deprecation
-      warnings would be reverted.
 - Open Questions
   (These questions are deferred to a later revision, and will not affect the acceptance process of this PDEP.)
     - Should ``inplace=True`` return the original pandas object that was operated inplace on?
@@ -312,6 +309,18 @@ Disadvantages:
 Given that `inplace` is already widely used by the pandas community, we would like to collect feedback about what the
 expected return type should be. Therefore, we will defer a decision on this until a later revision of this PDEP.
 
+## Backward compatibility
+
+Removing the `inplace` keyword is a breaking change, but since the affected behaviour is `inplace=True`, the default
+behaviour when not specifying the keyword (i.e. `inplace=False`) will not change and the keyword itself can first be
+deprecated before it is removed.
+
+Similarly for the `copy` keyword, this can be deprecated before it is removed.
+
+There are some behaviour changes (for example the current `copy=False` returning a shallow copy will no longer be an "
+actual" shallow copy, but protected under Copy-on-Write), but those behaviour changes are covered by the Copy-on-Write
+proposal[^1].
+
 ## Rejected ideas
 
 ### Remove the `inplace` keyword altogether
@@ -363,9 +372,6 @@ allow for bugs with Copy-on-Write to be addressed and for more optimizations to 
 
 The full removal of the `copy` parameter and `inplace` (where necessary) is set for pandas 3.0, which will coincide
 with the enablement of Copy-on-Write for pandas by default. 
-
-However, in the event that Copy-on-Write does not become the default, the deprecations for the `copy` keyword will
-be reverted, as `copy=False` would be necessary to create a shallow copy where possible (in the absence of Copy-on-Write).
 
 ## PDEP History
 
