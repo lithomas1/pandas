@@ -7,8 +7,6 @@ Mostly vendored from https://github.com/numba/numba/blob/main/numba/tests/pdlike
 
 from __future__ import annotations
 
-import operator
-
 import numba
 from numba.core import (
     cgutils,
@@ -20,17 +18,17 @@ from numba.core.extending import (
     box,
     lower_builtin,
     make_attribute_wrapper,
-    overload,
     register_model,
     type_callable,
     typeof_impl,
     unbox,
 )
 from numba.core.imputils import impl_ret_borrowed
+from numba.np.arrayobj import make_array
+import numpy as np
 
 from pandas.core.frame import DataFrame
 from pandas.core.indexes.base import Index
-from pandas.core.series import Series
 
 
 # TODO: Range index support
@@ -63,68 +61,80 @@ class IndexType(types.Buffer):
 
 
 # class SeriesType(types.ArrayCompatible):
-class SeriesType(types.Type):
-    """
-    The type class for Series objects.
-    """
+# class SeriesType(types.Type):
+#     """
+#     The type class for Series objects.
+#     """
+#
+#     array_priority = 1000
+#
+#     def __init__(self, dtype, index) -> None:
+#         assert isinstance(index, IndexType)
+#         self.dtype = dtype
+#         self.index = index
+#         self.values = types.Array(self.dtype, 1, "C")
+#         name = f"series({dtype}, {index})"
+#         super().__init__(name)
+#
+#     @property
+#     def key(self):
+#         return self.dtype, self.index
+#
+#     @property
+#     def as_array(self):
+#         return self.values
+#
+#     def copy(self, dtype=None, ndim: int = 1, layout: str = "C"):
+#         assert ndim == 1
+#         assert layout == "C"
+#         if dtype is None:
+#             dtype = self.dtype
+#         return type(self)(dtype, self.index)
 
-    array_priority = 1000
 
-    def __init__(self, dtype, index) -> None:
-        assert isinstance(index, IndexType)
-        self.dtype = dtype
-        self.index = index
-        self.values = types.Array(self.dtype, 1, "C")
-        name = f"series({dtype}, {index})"
-        super().__init__(name)
+# class DataFrameType(types.Type):
+#     """
+#     The type class for DataFrame objects.
+#     """
+#
+#     array_priority = 1000
+#
+#     def __init__(self, dtype, index, layout, columns) -> None:
+#         assert isinstance(index, IndexType)
+#         self.dtype = dtype
+#         self.index = index
+#         self.layout = layout
+#         self.values = types.Array(self.dtype, 2, layout)
+#         self.columns = columns
+#         name = f"dataframe({dtype}, {index}, {layout}, {columns})"
+#         super().__init__(name)
+#
+#     @property
+#     def key(self):
+#         return self.dtype, self.index, self.layout, self.columns
+#
+#     @property
+#     def as_array(self):
+#         return self.values
+#
+#     def copy(self, dtype=None, ndim: int = 2, layout: str = "F"):
+#         assert ndim == 2
+#         if dtype is None:
+#             dtype = self.dtype
+#         return type(self)(dtype, self.index, layout, self.columns)
 
-    @property
-    def key(self):
-        return self.dtype, self.index
 
-    @property
-    def as_array(self):
-        return self.values
-
-    def copy(self, dtype=None, ndim: int = 1, layout: str = "C"):
-        assert ndim == 1
-        assert layout == "C"
-        if dtype is None:
-            dtype = self.dtype
-        return type(self)(dtype, self.index)
-
-
-# class DataFrameType(types.ArrayCompatible):
 class DataFrameType(types.Type):
-    """
-    The type class for DataFrame objects.
-    """
-
-    array_priority = 1000
-
-    def __init__(self, dtype, index, layout, columns) -> None:
-        assert isinstance(index, IndexType)
-        self.dtype = dtype
+    def __init__(self, values_dtype, index, columns) -> None:
+        self.values_dtype = values_dtype
         self.index = index
-        self.layout = layout
-        self.values = types.Array(self.dtype, 2, layout)
         self.columns = columns
-        name = f"dataframe({dtype}, {index}, {layout}, {columns})"
+        name = f"dataframe({self.values_dtype}, {index}, {columns})"
         super().__init__(name)
 
     @property
     def key(self):
-        return self.dtype, self.index, self.layout, self.columns
-
-    @property
-    def as_array(self):
-        return self.values
-
-    def copy(self, dtype=None, ndim: int = 2, layout: str = "F"):
-        assert ndim == 2
-        if dtype is None:
-            dtype = self.dtype
-        return type(self)(dtype, self.index, layout, self.columns)
+        return self.values_dtype, self.index, self.columns
 
 
 @typeof_impl.register(Index)
@@ -134,49 +144,55 @@ def typeof_index(val, c):
     return IndexType(arrty.dtype, arrty.layout, type(val))
 
 
-@typeof_impl.register(Series)
-def typeof_series(val, c):
-    index = typeof_impl(val.index, c)
-    arrty = typeof_impl(val.values, c)
-    assert arrty.ndim == 1
-    assert arrty.layout == "C"
-    return SeriesType(arrty.dtype, index)
+# @typeof_impl.register(Series)
+# def typeof_series(val, c):
+#     index = typeof_impl(val.index, c)
+#     arrty = typeof_impl(val.values, c)
+#     assert arrty.ndim == 1
+#     assert arrty.layout == "C"
+#     return SeriesType(arrty.dtype, index)
 
 
 @typeof_impl.register(DataFrame)
 def typeof_df(val, c):
     index = typeof_impl(val.index, c)
-    arrty = typeof_impl(val.values, c)
+    # arrty = typeof_impl(val.values, c)
+
+    vals_dtype_dict = val.dtypes.to_dict()
+    vals_np_dtype = np.dtype([(name, dtype) for name, dtype in vals_dtype_dict.items()])
+
+    vals_nb_dtype = numba.np.numpy_support.from_struct_dtype(vals_np_dtype)
+    vals_dtype = types.Array(vals_nb_dtype, 1, "C", aligned=False)
+
     dtype = val.columns.dtype
     if dtype == object:
         dtype = types.unicode_type
     else:
         dtype = numba.from_dtype(dtype)
     colty = types.ListType(dtype)
-    assert arrty.ndim == 2
-    return DataFrameType(arrty.dtype, index, arrty.layout, colty)
+    return DataFrameType(vals_dtype, index, colty)
 
 
-@type_callable("__array_wrap__")
-def type_array_wrap(context):
-    def typer(input_type, result):
-        if isinstance(input_type, (IndexType, SeriesType)):
-            return input_type.copy(
-                dtype=result.dtype, ndim=result.ndim, layout=result.layout
-            )
+# @type_callable("__array_wrap__")
+# def type_array_wrap(context):
+#     def typer(input_type, result):
+#         if isinstance(input_type, (IndexType, SeriesType)):
+#             return input_type.copy(
+#                 dtype=result.dtype, ndim=result.ndim, layout=result.layout
+#             )
+#
+#     return typer
 
-    return typer
 
-
-@type_callable(Series)
-def type_series_constructor(context):
-    def typer(data, index):
-        if isinstance(index, IndexType) and isinstance(data, types.Array):
-            assert data.layout == "C"
-            assert data.ndim == 1
-            return SeriesType(data.dtype, index)
-
-    return typer
+# @type_callable(Series)
+# def type_series_constructor(context):
+#     def typer(data, index):
+#         if isinstance(index, IndexType) and isinstance(data, types.Array):
+#             assert data.layout == "C"
+#             assert data.ndim == 1
+#             return SeriesType(data.dtype, index)
+#
+#     return typer
 
 
 @type_callable(Index)
@@ -192,15 +208,38 @@ def type_index_constructor(context):
 
 @type_callable(DataFrame)
 def type_frame_constructor(context):
-    def typer(data, index, columns=None):
-        if isinstance(index, IndexType) and isinstance(data, types.Array):
-            assert data.ndim == 2
-            if columns is None:
-                columns = types.ListType(types.int64)
-            assert isinstance(columns, types.ListType) and (
-                columns.dtype is types.unicode_type or types.Integer
+    def typer(data, index=None, columns=None):
+        # TODO: Can I overload this with multiple isinstance
+        if (
+            isinstance(data, types.Array)
+            and isinstance(index, IndexType)
+            and isinstance(columns, types.ListType)
+        ):
+            assert isinstance(data.dtype, types.Record)
+
+            return DataFrameType(data, index, columns)
+        elif isinstance(data, types.Array) and index is None:
+            assert isinstance(data.dtype, types.Record)
+
+            # If no index, it will be a "RangeIndex"
+            # TODO: get rid of columns argument here
+            return DataFrameType(
+                data,
+                IndexType(numba.int64, "C", Index),
+                types.ListType(types.unicode_type),
             )
-            return DataFrameType(data.dtype, index, data.layout, columns)
+
+        elif isinstance(data, DataFrameType):
+            return DataFrameType(data.values_dtype, data.index, data.columns)
+
+        # if isinstance(index, IndexType) and isinstance(data, types.Array):
+        #     assert data.ndim == 2
+        #     if columns is None:
+        #         columns = types.ListType(types.int64)
+        #     assert isinstance(columns, types.ListType) and (
+        #         columns.dtype is types.unicode_type or types.Integer
+        #     )
+        #     return DataFrameType(data.dtype, index, data.layout, columns)
 
     return typer
 
@@ -213,14 +252,14 @@ class IndexModel(models.StructModel):
         models.StructModel.__init__(self, dmm, fe_type, members)
 
 
-@register_model(SeriesType)
-class SeriesModel(models.StructModel):
-    def __init__(self, dmm, fe_type) -> None:
-        members = [
-            ("index", fe_type.index),
-            ("values", fe_type.as_array),
-        ]
-        models.StructModel.__init__(self, dmm, fe_type, members)
+# @register_model(SeriesType)
+# class SeriesModel(models.StructModel):
+#     def __init__(self, dmm, fe_type) -> None:
+#         members = [
+#             ("index", fe_type.index),
+#             ("values", fe_type.as_array),
+#         ]
+#         models.StructModel.__init__(self, dmm, fe_type, members)
 
 
 @register_model(DataFrameType)
@@ -228,7 +267,7 @@ class DataFrameModel(models.StructModel):
     def __init__(self, dmm, fe_type) -> None:
         members = [
             ("index", fe_type.index),
-            ("values", fe_type.as_array),
+            ("values", fe_type.values_dtype),
             ("columns", fe_type.columns),
         ]
         models.StructModel.__init__(self, dmm, fe_type, members)
@@ -236,49 +275,34 @@ class DataFrameModel(models.StructModel):
 
 make_attribute_wrapper(IndexType, "data", "_data")
 
-make_attribute_wrapper(SeriesType, "index", "index")
-make_attribute_wrapper(SeriesType, "values", "values")
+# make_attribute_wrapper(SeriesType, "index", "index")
+# make_attribute_wrapper(SeriesType, "values", "values")
 
 make_attribute_wrapper(DataFrameType, "index", "index")
-make_attribute_wrapper(DataFrameType, "values", "values")
+make_attribute_wrapper(DataFrameType, "values", "_values")
+# make_attribute_wrapper(DataFrameType, "values_ptr", "_values_ptr")
 make_attribute_wrapper(DataFrameType, "columns", "columns")
 
 
-@lower_builtin("__array__", IndexType)
-def index_as_array(context, builder, sig, args):
-    val = cgutils.create_struct_proxy(sig.args[0])(context, builder, ref=args[0])
-    return val._get_ptr_by_name("data")
-
-
-@lower_builtin("__array__", SeriesType)
-def series_as_array(context, builder, sig, args):
-    val = cgutils.create_struct_proxy(sig.args[0])(context, builder, ref=args[0])
-    return val._get_ptr_by_name("values")
-
-
-# @lower_builtin("__array_wrap__", IndexType, types.Array)
-# def index_wrap_array(context, builder, sig, args):
-#     dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
-#     dest.data = args[1]
-#     return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
+# @lower_builtin("__array__", IndexType)
+# def index_as_array(context, builder, sig, args):
+#     val = cgutils.create_struct_proxy(sig.args[0])(context, builder, ref=args[0])
+#     return val._get_ptr_by_name("data")
 #
 #
-# @lower_builtin("__array_wrap__", SeriesType, types.Array)
-# def series_wrap_array(context, builder, sig, args):
-#     src = cgutils.create_struct_proxy(sig.args[0])(value=args[0])
-#     dest = cgutils.create_struct_proxy(sig.return_type)(context, builder)
-#     dest.values = args[1]
-#     dest.index = src.index
-#     return impl_ret_borrowed(context, builder, sig.return_type, dest._getvalue())
+# @lower_builtin("__array__", SeriesType)
+# def series_as_array(context, builder, sig, args):
+#     val = cgutils.create_struct_proxy(sig.args[0])(context, builder, ref=args[0])
+#     return val._get_ptr_by_name("values")
 
 
-@lower_builtin(Series, types.Array, IndexType)
-def pdseries_constructor(context, builder, sig, args):
-    data, index = args
-    series = cgutils.create_struct_proxy(sig.return_type)(context, builder)
-    series.index = index
-    series.values = data
-    return impl_ret_borrowed(context, builder, sig.return_type, series._getvalue())
+# @lower_builtin(Series, types.Array, IndexType)
+# def pdseries_constructor(context, builder, sig, args):
+#     data, index = args
+#     series = cgutils.create_struct_proxy(sig.return_type)(context, builder)
+#     series.index = index
+#     series.values = data
+#     return impl_ret_borrowed(context, builder, sig.return_type, series._getvalue())
 
 
 @lower_builtin(Index, types.Array)
@@ -289,15 +313,38 @@ def index_constructor(context, builder, sig, args):
     return impl_ret_borrowed(context, builder, sig.return_type, index._getvalue())
 
 
-# TODO: Support arbitrary iterables?
+# TODO: can we mix low level and high level numba extension APIs here
+# e.g. overload(DataFrame) that calls down into a lower_builtin wrapped
+# function to create the struct?
+
+# @lower_builtin(DataFrame, types.Array, IndexType)
+# def pdframe_constructor(context, builder, sig, args):
+#     data, index, columns = args
+#     df = cgutils.create_struct_proxy(sig.return_type)(context, builder)
+#     # df.index = index
+#     # df._values = data
+#     # df.columns = columns
+#     return impl_ret_borrowed(context, builder, sig.return_type, df._getvalue())
+
+
 @lower_builtin(DataFrame, types.Array, IndexType, types.ListType)
-def pdframe_constructor(context, builder, sig, args):
+def pdframe_constructor1(context, builder, sig, args):
+    with open("1.txt", "w") as f:
+        f.write(str(builder.module))
+    # print(builder.module)
     data, index, columns = args
     df = cgutils.create_struct_proxy(sig.return_type)(context, builder)
+    ary = make_array(sig.args[0])(context, builder, value=data)
+    df_ary = make_array(sig.args[0])(context, builder, value=df.values)
+    context.nrt.incref(builder, sig.args[0], data)
     df.index = index
-    df.values = data
+    cgutils.copy_struct(df_ary, ary)  # data #ary.data
     df.columns = columns
-    return impl_ret_borrowed(context, builder, sig.return_type, df._getvalue())
+    ret = df._getvalue()
+    with open("2.txt", "w") as f:
+        f.write(str(builder.module))
+    return ret
+    # return impl_ret_untracked(context, builder, sig.return_type, df._getvalue())
 
 
 @unbox(IndexType)
@@ -315,22 +362,22 @@ def unbox_index(typ, obj, c):
     return NativeValue(index._getvalue())
 
 
-@unbox(SeriesType)
-def unbox_series(typ, obj, c):
-    """
-    Convert a Series object to a native structure.
-    """
-    index_obj = c.pyapi.object_getattr_string(obj, "index")
-    values_obj = c.pyapi.object_getattr_string(obj, "values")
-    series = cgutils.create_struct_proxy(typ)(c.context, c.builder)
-    series.index = c.unbox(typ.index, index_obj).value
-    series.values = c.unbox(typ.values, values_obj).value
-
-    # Decrefs
-    c.pyapi.decref(index_obj)
-    c.pyapi.decref(values_obj)
-
-    return NativeValue(series._getvalue())
+# @unbox(SeriesType)
+# def unbox_series(typ, obj, c):
+#     """
+#     Convert a Series object to a native structure.
+#     """
+#     index_obj = c.pyapi.object_getattr_string(obj, "index")
+#     values_obj = c.pyapi.object_getattr_string(obj, "values")
+#     series = cgutils.create_struct_proxy(typ)(c.context, c.builder)
+#     series.index = c.unbox(typ.index, index_obj).value
+#     series.values = c.unbox(typ.values, values_obj).value
+#
+#     # Decrefs
+#     c.pyapi.decref(index_obj)
+#     c.pyapi.decref(values_obj)
+#
+#     return NativeValue(series._getvalue())
 
 
 @unbox(DataFrameType)
@@ -340,16 +387,37 @@ def unbox_df(typ, obj, c):
     """
     # TODO: Check refcounting!!!
     index_obj = c.pyapi.object_getattr_string(obj, "index")
-    values_obj = c.pyapi.object_getattr_string(obj, "values")
+    # values_obj = c.pyapi.object_getattr_string(obj, "values")
+
+    mgr = c.pyapi.object_getattr_string(obj, "_mgr")
+    col_arrays = c.pyapi.object_getattr_string(mgr, "column_arrays")
+
     columns_index_obj = c.pyapi.object_getattr_string(obj, "columns")
 
     columns_list_obj = c.pyapi.call_method(columns_index_obj, "tolist")
+
+    # Create recarray from df
+    recarray = c.pyapi.unserialize(c.pyapi.serialize_object(np.rec.fromarrays))
+    recarray_obj = c.pyapi.call_function_objargs(
+        # TODO: Is the borrowing of None here safe?
+        recarray,
+        (
+            col_arrays,
+            c.pyapi.borrow_none(),
+            c.pyapi.borrow_none(),
+            c.pyapi.borrow_none(),
+            columns_list_obj,
+        ),
+    )
 
     typed_list = c.pyapi.unserialize(c.pyapi.serialize_object(numba.typed.List))
 
     df = cgutils.create_struct_proxy(typ)(c.context, c.builder)
     df.index = c.unbox(typ.index, index_obj).value
-    df.values = c.unbox(typ.values, values_obj).value
+    # df.values = c.unbox(typ.values, values_obj).value
+    # print(typ.values_dtype)
+    df._values = c.unbox(typ.values_dtype, recarray_obj).value
+
     # Convert to numba typed list
     columns_typed_list_obj = c.pyapi.call_function_objargs(
         typed_list, (columns_list_obj,)
@@ -357,8 +425,10 @@ def unbox_df(typ, obj, c):
     df.columns = c.unbox(typ.columns, columns_typed_list_obj).value
 
     # Decrefs
+    c.pyapi.decref(recarray_obj)
+
     c.pyapi.decref(index_obj)
-    c.pyapi.decref(values_obj)
+    # c.pyapi.decref(values_obj)
     c.pyapi.decref(columns_index_obj)
     c.pyapi.decref(columns_list_obj)
     c.pyapi.decref(columns_typed_list_obj)
@@ -383,23 +453,23 @@ def box_index(typ, val, c):
     return index_obj
 
 
-@box(SeriesType)
-def box_series(typ, val, c):
-    """
-    Convert a native series structure to a Series object.
-    """
-    series = cgutils.create_struct_proxy(typ)(c.context, c.builder, value=val)
-    class_obj = c.pyapi.unserialize(c.pyapi.serialize_object(Series))
-    index_obj = c.box(typ.index, series.index)
-    array_obj = c.box(typ.as_array, series.values)
-    series_obj = c.pyapi.call_function_objargs(class_obj, (array_obj, index_obj))
-
-    # Decrefs
-    c.pyapi.decref(class_obj)
-    c.pyapi.decref(index_obj)
-    c.pyapi.decref(array_obj)
-
-    return series_obj
+# @box(SeriesType)
+# def box_series(typ, val, c):
+#     """
+#     Convert a native series structure to a Series object.
+#     """
+#     series = cgutils.create_struct_proxy(typ)(c.context, c.builder, value=val)
+#     class_obj = c.pyapi.unserialize(c.pyapi.serialize_object(Series))
+#     index_obj = c.box(typ.index, series.index)
+#     array_obj = c.box(typ.as_array, series.values)
+#     series_obj = c.pyapi.call_function_objargs(class_obj, (array_obj, index_obj))
+#
+#     # Decrefs
+#     c.pyapi.decref(class_obj)
+#     c.pyapi.decref(index_obj)
+#     c.pyapi.decref(array_obj)
+#
+#     return series_obj
 
 
 @box(DataFrameType)
@@ -411,13 +481,15 @@ def box_df(typ, val, c):
     class_obj = c.pyapi.unserialize(c.pyapi.serialize_object(DataFrame))
     indexclass_obj = c.pyapi.unserialize(c.pyapi.serialize_object(Index))
     index_obj = c.box(typ.index, df.index)
-    array_obj = c.box(typ.as_array, df.values)
+    array_obj = c.box(typ.values_dtype, df.values)
 
     columns_obj = c.box(typ.columns, df.columns)
     columns_index_obj = c.pyapi.call_function_objargs(indexclass_obj, (columns_obj,))
 
     df_obj = c.pyapi.call_function_objargs(
-        class_obj, (array_obj, index_obj, columns_index_obj)
+        # class_obj, (array_obj, index_obj, columns_index_obj)
+        class_obj,
+        (array_obj, index_obj),
     )
 
     # Decrefs
@@ -431,18 +503,25 @@ def box_df(typ, val, c):
     return df_obj
 
 
-binops = [operator.add, operator.sub, operator.mul, operator.truediv]
+# binops = [operator.add, operator.sub, operator.mul, operator.truediv]
 
 
-def _generate_series_binop(op):
-    def series_op(self, other):
-        if isinstance(self, SeriesType) and isinstance(other, SeriesType):
-            return lambda self, other: Series(
-                op(self.values, other.values), index=self.index
-            )
+# def _generate_series_binop(op):
+#     def series_op(self, other):
+#         if isinstance(self, SeriesType) and isinstance(other, SeriesType):
+#             return lambda self, other: Series(
+#                 op(self.values, other.values), index=self.index
+#             )
+#
+#     return series_op
 
-    return series_op
 
+# for op in binops:
+#     overload(op)(_generate_series_binop(op))
 
-for op in binops:
-    overload(op)(_generate_series_binop(op))
+# @overload(operator.getitem)
+# def df_getitem(self, colname):
+#     if isinstance(self, DataFrameType):
+#         return lambda self, colname: Series(
+#             self._values[colname], self.index
+#         )
