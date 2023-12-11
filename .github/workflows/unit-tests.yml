@@ -189,6 +189,18 @@ jobs:
         PYTEST_WORKERS: 0
       if: ${{ matrix.pattern == '' && (always() && steps.build.outcome == 'success')}}
 
+    - name: Open or update issue on failure
+      if: |
+        failure()
+        && github.event_name != 'pull_request'
+        && github.repository == 'pandas-dev/pandas'
+        && steps.run_tests.outcome == 'failure'
+      uses: xarray-contrib/issue-from-pytest-log@v1.2.7
+      with:
+        log-path: output-log.jsonl
+        issue-title: ⚠️ Upstream CI failed ⚠️
+        issue-label: upstream
+
   macos-windows:
     timeout-minutes: 90
     strategy:
