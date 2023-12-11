@@ -13,6 +13,7 @@ dependencies:
   # test dependencies
   - pytest>=7.3.2
   - pytest-cov
+  - pytest-reportlog
   # Once pytest-cov > 4 comes out, unpin this
   # Right now, a DeprecationWarning related to rsyncdir
   # causes an InternalError within pytest

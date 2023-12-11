@@ -16,6 +16,7 @@ dependencies:
   # test dependencies
   - pytest>=7.3.2
   - pytest-cov
+  - pytest-reportlog
   - pytest-xdist>=2.2.0
   - hypothesis>=6.46.1
 

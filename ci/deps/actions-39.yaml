@@ -13,6 +13,7 @@ dependencies:
   # test dependencies
   - pytest>=7.3.2
   - pytest-cov
+  - pytest-reportlog
   - pytest-xdist>=2.2.0
   - pytest-localserver>=0.7.1
   - pytest-qt>=4.2.0
