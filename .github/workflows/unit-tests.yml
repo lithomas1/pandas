@@ -193,7 +193,7 @@ jobs:
       if: |
         failure()
         && github.event_name != 'pull_request'
-        && github.repository == 'pandas-dev/pandas'
+        && github.repository == 'lithomas1/pandas'
         && steps.run_tests.outcome == 'failure'
       uses: xarray-contrib/issue-from-pytest-log@v1.2.7
       with:
