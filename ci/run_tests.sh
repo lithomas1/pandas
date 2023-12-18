@@ -17,5 +17,7 @@ if [[ "$PATTERN" ]]; then
   PYTEST_CMD="$PYTEST_CMD -m \"$PATTERN\""
 fi
 
+exit 1
+
 echo $PYTEST_CMD
 sh -c "$PYTEST_CMD"
