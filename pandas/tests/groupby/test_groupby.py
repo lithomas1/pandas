@@ -6,6 +6,9 @@ import re
 import numpy as np
 import pytest
 
+from pandas._config import using_string_dtype
+
+from pandas.compat import HAS_PYARROW
 from pandas.errors import (
     PerformanceWarning,
     SpecificationError,
@@ -1214,7 +1217,7 @@ def test_groupby_complex_mean():
     tm.assert_frame_equal(result, expected)
 
 
-def test_groupby_complex_numbers(using_infer_string):
+def test_groupby_complex_numbers():
     # GH 17927
     df = DataFrame(
         [
@@ -1223,11 +1226,10 @@ def test_groupby_complex_numbers(using_infer_string):
             {"a": 4, "b": 1},
         ]
     )
-    dtype = "string[pyarrow_numpy]" if using_infer_string else object
     expected = DataFrame(
         np.array([1, 1, 1], dtype=np.int64),
         index=Index([(1 + 1j), (1 + 2j), (1 + 0j)], name="b"),
-        columns=Index(["a"], dtype=dtype),
+        columns=Index(["a"]),
     )
     result = df.groupby("b", sort=False).count()
     tm.assert_frame_equal(result, expected)
@@ -1597,6 +1599,7 @@ def test_groupby_two_group_keys_all_nan():
     assert result == {}
 
 
+@pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
 def test_groupby_2d_malformed():
     d = DataFrame(index=range(2))
     d["group"] = ["g1", "g2"]
@@ -1741,6 +1744,10 @@ def test_handle_dict_return_value(df):
     tm.assert_series_equal(result, expected)
 
 
+# TODO harmonize error messages
+@pytest.mark.xfail(
+    using_string_dtype() and not HAS_PYARROW, reason="TODO(infer_string)", strict=False
+)
 @pytest.mark.parametrize("grouper", ["A", ["A", "B"]])
 def test_set_group_name(df, grouper, using_infer_string):
     def f(group):
@@ -2094,7 +2101,7 @@ def test_empty_groupby(
             idx = Index(lev, name=keys[0])
 
         if using_infer_string:
-            columns = Index([], dtype="string[pyarrow_numpy]")
+            columns = Index([], dtype="str")
         else:
             columns = []
         expected = DataFrame([], columns=columns, index=idx)
@@ -2691,6 +2698,7 @@ def test_groupby_all_nan_groups_drop():
     tm.assert_series_equal(result, expected)
 
 
+@pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)", strict=False)
 @pytest.mark.parametrize("numeric_only", [True, False])
 def test_groupby_empty_multi_column(as_index, numeric_only):
     # GH 15106 & GH 41998
@@ -2707,6 +2715,7 @@ def test_groupby_empty_multi_column(as_index, numeric_only):
     tm.assert_frame_equal(result, expected)
 
 
+@pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
 def test_groupby_aggregation_non_numeric_dtype():
     # GH #43108
     df = DataFrame(
@@ -2816,7 +2825,9 @@ def test_rolling_wrong_param_min_period():
     test_df = DataFrame([name_l, val_l]).T
     test_df.columns = ["name", "val"]
 
-    result_error_msg = r"__init__\(\) got an unexpected keyword argument 'min_period'"
+    result_error_msg = (
+        r"^[a-zA-Z._]*\(\) got an unexpected keyword argument 'min_period'"
+    )
     with pytest.raises(TypeError, match=result_error_msg):
         test_df.groupby("name")["val"].rolling(window=2, min_period=1).sum()
 
@@ -2862,6 +2873,7 @@ def test_groupby_none_in_first_mi_level():
     tm.assert_series_equal(result, expected)
 
 
+@pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
 def test_groupby_none_column_name():
     # GH#47348
     df = DataFrame({None: [1, 1, 2, 2], "b": [1, 1, 2, 3], "c": [4, 5, 6, 7]})

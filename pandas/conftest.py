@@ -1248,7 +1248,6 @@ def nullable_string_dtype(request):
     params=[
         "python",
         pytest.param("pyarrow", marks=td.skip_if_no("pyarrow")),
-        pytest.param("pyarrow_numpy", marks=td.skip_if_no("pyarrow")),
     ]
 )
 def string_storage(request):
@@ -1257,7 +1256,25 @@ def string_storage(request):
 
     * 'python'
     * 'pyarrow'
-    * 'pyarrow_numpy'
+    """
+    return request.param
+
+
+@pytest.fixture(
+    params=[
+        ("python", pd.NA),
+        pytest.param(("pyarrow", pd.NA), marks=td.skip_if_no("pyarrow")),
+        pytest.param(("pyarrow", np.nan), marks=td.skip_if_no("pyarrow")),
+        ("python", np.nan),
+    ]
+)
+def string_dtype_arguments(request):
+    """
+    Parametrized fixture for StringDtype storage and na_value.
+
+    * 'python' + pd.NA
+    * 'pyarrow' + pd.NA
+    * 'pyarrow' + np.nan
     """
     return request.param
 
@@ -1306,20 +1323,36 @@ def object_dtype(request):
 
 @pytest.fixture(
     params=[
-        "object",
-        "string[python]",
-        pytest.param("string[pyarrow]", marks=td.skip_if_no("pyarrow")),
-        pytest.param("string[pyarrow_numpy]", marks=td.skip_if_no("pyarrow")),
-    ]
+        np.dtype("object"),
+        ("python", pd.NA),
+        pytest.param(("pyarrow", pd.NA), marks=td.skip_if_no("pyarrow")),
+        pytest.param(("pyarrow", np.nan), marks=td.skip_if_no("pyarrow")),
+        ("python", np.nan),
+    ],
+    ids=[
+        "string=object",
+        "string=string[python]",
+        "string=string[pyarrow]",
+        "string=str[pyarrow]",
+        "string=str[python]",
+    ],
 )
 def any_string_dtype(request):
     """
     Parametrized fixture for string dtypes.
     * 'object'
-    * 'string[python]'
-    * 'string[pyarrow]'
+    * 'string[python]' (NA variant)
+    * 'string[pyarrow]' (NA variant)
+    * 'str' (NaN variant, with pyarrow)
+    * 'str' (NaN variant, without pyarrow)
     """
-    return request.param
+    if isinstance(request.param, np.dtype):
+        return request.param
+    else:
+        # need to instantiate the StringDtype here instead of in the params
+        # to avoid importing pyarrow during test collection
+        storage, na_value = request.param
+        return pd.StringDtype(storage, na_value)
 
 
 @pytest.fixture(params=tm.DATETIME64_DTYPES)
@@ -1399,6 +1432,21 @@ def complex_dtype(request):
     * complex
     * 'complex64'
     * 'complex128'
+    """
+    return request.param
+
+
+@pytest.fixture(params=tm.COMPLEX_FLOAT_DTYPES)
+def complex_or_float_dtype(request):
+    """
+    Parameterized fixture for complex and numpy float dtypes.
+
+    * complex
+    * 'complex64'
+    * 'complex128'
+    * float
+    * 'float32'
+    * 'float64'
     """
     return request.param
 

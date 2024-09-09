@@ -593,7 +593,13 @@ class Series(base.IndexOpsMixin, NDFrame):  # type: ignore[misc]
         self.name = name
         self._set_axis(0, index)
 
-        if original_dtype is None and is_pandas_object and data_dtype == np.object_:
+        # TODO: verify we're silencing the warning correctly here
+        if (
+            original_dtype is None
+            and is_pandas_object
+            and data_dtype == np.object_
+            and self.dtype != "str"
+        ):
             if self.dtype != data_dtype:
                 warnings.warn(
                     "Dtype inference on a pandas object "

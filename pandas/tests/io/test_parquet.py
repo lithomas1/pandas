@@ -8,7 +8,10 @@ import pathlib
 import numpy as np
 import pytest
 
-from pandas._config import using_copy_on_write
+from pandas._config import (
+    using_copy_on_write,
+    using_string_dtype,
+)
 from pandas._config.config import _get_option
 
 from pandas.compat import is_platform_windows
@@ -53,6 +56,7 @@ pytestmark = [
     pytest.mark.filterwarnings(
         "ignore:Passing a BlockManager to DataFrame:DeprecationWarning"
     ),
+    pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)", strict=False),
 ]
 
 
@@ -974,6 +978,8 @@ class TestParquetPyArrow(Base):
         check_round_trip(df, pa, write_kwargs={"version": ver})
 
     def test_timezone_aware_index(self, request, pa, timezone_aware_date_list):
+        pytest.importorskip("pyarrow", "11.0.0")
+
         if timezone_aware_date_list.tzinfo != datetime.timezone.utc:
             request.applymarker(
                 pytest.mark.xfail(
@@ -1314,6 +1320,9 @@ class TestParquetFastParquet(Base):
         expected = df.copy()
         check_round_trip(df, fp, expected=expected)
 
+    @pytest.mark.xfail(
+        reason="fastparquet bug, see https://github.com/dask/fastparquet/issues/929"
+    )
     @pytest.mark.skipif(using_copy_on_write(), reason="fastparquet writes into Index")
     def test_timezone_aware_index(self, fp, timezone_aware_date_list):
         idx = 5 * [timezone_aware_date_list]

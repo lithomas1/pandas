@@ -923,7 +923,12 @@ class DataFrame(NDFrame, OpsMixin):
 
         NDFrame.__init__(self, mgr)
 
-        if original_dtype is None and is_pandas_object and data_dtype == np.object_:
+        if (
+            original_dtype is None
+            and is_pandas_object
+            and data_dtype == np.object_
+            and self.dtypes.iloc[0] != "str"
+        ):
             if self.dtypes.iloc[0] != data_dtype:
                 warnings.warn(
                     "Dtype inference on a pandas object "
@@ -4979,7 +4984,9 @@ class DataFrame(NDFrame, OpsMixin):
         -----
         * To select all *numeric* types, use ``np.number`` or ``'number'``
         * To select strings you must use the ``object`` dtype, but note that
-          this will return *all* object dtype columns
+          this will return *all* object dtype columns. With
+          ``pd.options.future.infer_string`` enabled, using ``"str"`` will
+          work to select all string columns.
         * See the `numpy dtype hierarchy
           <https://numpy.org/doc/stable/reference/arrays.scalars.html>`__
         * To select datetimes, use ``np.datetime64``, ``'datetime'`` or

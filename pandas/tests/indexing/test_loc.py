@@ -12,9 +12,10 @@ from dateutil.tz import gettz
 import numpy as np
 import pytest
 
-from pandas._config import using_pyarrow_string_dtype
+from pandas._config import using_string_dtype
 
 from pandas._libs import index as libindex
+from pandas.compat import HAS_PYARROW
 from pandas.compat.numpy import np_version_gt2
 from pandas.errors import IndexingError
 import pandas.util._test_decorators as td
@@ -63,11 +64,16 @@ def test_not_change_nan_loc(series, new_series, expected_ser):
 
 
 class TestLoc:
-    def test_none_values_on_string_columns(self):
+    def test_none_values_on_string_columns(self, using_infer_string):
         # Issue #32218
-        df = DataFrame(["1", "2", None], columns=["a"], dtype="str")
-
+        df = DataFrame(["1", "2", None], columns=["a"], dtype=object)
         assert df.loc[2, "a"] is None
+
+        df = DataFrame(["1", "2", None], columns=["a"], dtype="str")
+        if using_infer_string:
+            assert np.isnan(df.loc[2, "a"])
+        else:
+            assert df.loc[2, "a"] is None
 
     @pytest.mark.parametrize("kind", ["series", "frame"])
     def test_loc_getitem_int(self, kind, request):
@@ -642,6 +648,7 @@ class TestLocBaseIndependent:
         expected["x"] = expected["x"].astype(np.int64)
         tm.assert_frame_equal(df, expected)
 
+    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
     def test_loc_setitem_consistency_slice_column_len(self):
         # .loc[:,column] setting with slice == len of the column
         # GH10408
@@ -1262,7 +1269,7 @@ class TestLocBaseIndependent:
 
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.xfail(using_pyarrow_string_dtype(), reason="can't set int into string")
+    @pytest.mark.xfail(using_string_dtype(), reason="can't set int into string")
     def test_loc_setitem_str_to_small_float_conversion_type(self):
         # GH#20388
 
@@ -1448,6 +1455,9 @@ class TestLocBaseIndependent:
             df.loc[2:3, "b"] = Categorical(["b", "b"], categories=["a", "b"])
         tm.assert_frame_equal(df, exp)
 
+    @pytest.mark.xfail(
+        using_string_dtype() and not HAS_PYARROW, reason="TODO(infer_string)"
+    )
     def test_loc_setitem_single_row_categorical(self, using_infer_string):
         # GH#25495
         df = DataFrame({"Alpha": ["a"], "Numeric": [0]})
@@ -1459,7 +1469,7 @@ class TestLocBaseIndependent:
 
         result = df["Alpha"]
         expected = Series(categories, index=df.index, name="Alpha").astype(
-            object if not using_infer_string else "string[pyarrow_numpy]"
+            object if not using_infer_string else "str"
         )
         tm.assert_series_equal(result, expected)
 
@@ -1634,7 +1644,7 @@ class TestLocBaseIndependent:
         df.loc[df.index[::2], "str"] = np.nan
         expected = Series(
             [np.nan, "qux", np.nan, "qux", np.nan],
-            dtype=object if not using_infer_string else "string[pyarrow_numpy]",
+            dtype=object if not using_infer_string else "str",
         ).values
         tm.assert_almost_equal(df["str"].values, expected)
 

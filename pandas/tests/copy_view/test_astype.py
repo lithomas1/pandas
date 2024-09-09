@@ -3,6 +3,9 @@ import pickle
 import numpy as np
 import pytest
 
+from pandas._config import using_string_dtype
+
+from pandas.compat import HAS_PYARROW
 from pandas.compat.pyarrow import pa_version_under12p0
 import pandas.util._test_decorators as td
 
@@ -221,6 +224,7 @@ def test_astype_arrow_timestamp(using_copy_on_write):
             )
 
 
+@pytest.mark.xfail(using_string_dtype() and HAS_PYARROW, reason="TODO(infer_string)")
 def test_convert_dtypes_infer_objects(using_copy_on_write):
     ser = Series(["a", "b", "c"])
     ser_orig = ser.copy()
@@ -240,6 +244,7 @@ def test_convert_dtypes_infer_objects(using_copy_on_write):
     tm.assert_series_equal(ser, ser_orig)
 
 
+@pytest.mark.xfail(using_string_dtype() and HAS_PYARROW, reason="TODO(infer_string)")
 def test_convert_dtypes(using_copy_on_write):
     df = DataFrame({"a": ["a", "b"], "b": [1, 2], "c": [1.5, 2.5], "d": [True, False]})
     df_orig = df.copy()

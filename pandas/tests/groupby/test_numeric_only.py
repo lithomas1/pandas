@@ -181,6 +181,7 @@ class TestNumericOnly:
                     "category type does not support sum operations",
                     re.escape(f"agg function failed [how->{method},dtype->object]"),
                     re.escape(f"agg function failed [how->{method},dtype->string]"),
+                    re.escape(f"agg function failed [how->{method},dtype->str]"),
                 ]
             )
             with pytest.raises(exception, match=msg):
@@ -198,6 +199,7 @@ class TestNumericOnly:
                     f"Cannot perform {method} with non-ordered Categorical",
                     re.escape(f"agg function failed [how->{method},dtype->object]"),
                     re.escape(f"agg function failed [how->{method},dtype->string]"),
+                    re.escape(f"agg function failed [how->{method},dtype->str]"),
                 ]
             )
             with pytest.raises(exception, match=msg):
@@ -273,9 +275,12 @@ def test_axis1_numeric_only(request, groupby_func, numeric_only, using_infer_str
             "has no kernel",
         )
         if using_infer_string:
-            import pyarrow as pa
+            try:
+                import pyarrow as pa
 
-            errs = (TypeError, pa.lib.ArrowNotImplementedError)
+                errs = (TypeError, pa.lib.ArrowNotImplementedError)
+            except ImportError:
+                errs = TypeError
         else:
             errs = TypeError
         with pytest.raises(errs, match=f"({'|'.join(msgs)})"):
