@@ -923,7 +923,12 @@ class DataFrame(NDFrame, OpsMixin):
 
         NDFrame.__init__(self, mgr)
 
-        if original_dtype is None and is_pandas_object and data_dtype == np.object_:
+        if (
+            original_dtype is None
+            and is_pandas_object
+            and data_dtype == np.object_
+            and self.dtypes.iloc[0] != "str"
+        ):
             if self.dtypes.iloc[0] != data_dtype:
                 warnings.warn(
                     "Dtype inference on a pandas object "

@@ -575,7 +575,13 @@ class Index(IndexOpsMixin, PandasObject):
 
         arr = klass._ensure_array(arr, arr.dtype, copy=False)
         result = klass._simple_new(arr, name, refs=refs)
-        if dtype is None and is_pandas_object and data_dtype == np.object_:
+        # TODO: also verify this check
+        if (
+            dtype is None
+            and is_pandas_object
+            and data_dtype == np.object_
+            and result.dtype != "str"
+        ):
             if result.dtype != data_dtype:
                 warnings.warn(
                     "Dtype inference on a pandas object "
