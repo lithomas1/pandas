@@ -286,7 +286,6 @@ class TestRoundTrip:
             )
             tm.assert_frame_equal(df, act, check_names=check_names)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
     def test_read_excel_parse_dates(self, ext):
         # see gh-11544, gh-12051
         df = DataFrame(

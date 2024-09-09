@@ -1,8 +1,6 @@
 import numpy as np
 import pytest
 
-from pandas._config import using_string_dtype
-
 import pandas as pd
 from pandas import (
     DataFrame,
@@ -354,7 +352,6 @@ class TestDataFrameQuantile:
         )
         tm.assert_frame_equal(result, expected)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
     def test_quantile_datetime(self, unit):
         dti = pd.to_datetime(["2010", "2011"]).as_unit(unit)
         df = DataFrame({"a": dti, "b": [0, 5]})
@@ -408,7 +405,6 @@ class TestDataFrameQuantile:
         expected = DataFrame(index=[0.5], columns=[])
         tm.assert_frame_equal(result, expected)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
     @pytest.mark.parametrize(
         "dtype",
         [
@@ -679,7 +675,6 @@ class TestDataFrameQuantile:
         )
         tm.assert_frame_equal(res, exp)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)")
     def test_quantile_empty_no_rows_floats(self, interp_method):
         interpolation, method = interp_method
 
@@ -918,7 +913,6 @@ class TestQuantileExtensionDtype:
         else:
             tm.assert_series_equal(result, expected)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)", strict=False)
     @pytest.mark.parametrize(
         "dtype, expected_data, expected_index, axis",
         [
@@ -937,7 +931,6 @@ class TestQuantileExtensionDtype:
         )
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)", strict=False)
     @pytest.mark.parametrize(
         "dtype, expected_data, expected_index, axis, expected_dtype",
         [
@@ -956,7 +949,6 @@ class TestQuantileExtensionDtype:
         )
         tm.assert_series_equal(result, expected)
 
-    @pytest.mark.xfail(using_string_dtype(), reason="TODO(infer_string)", strict=False)
     @pytest.mark.parametrize(
         "expected_data, expected_index, axis",
         [

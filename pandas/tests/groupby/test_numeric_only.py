@@ -275,9 +275,12 @@ def test_axis1_numeric_only(request, groupby_func, numeric_only, using_infer_str
             "has no kernel",
         )
         if using_infer_string:
-            import pyarrow as pa
+            try:
+                import pyarrow as pa
 
-            errs = (TypeError, pa.lib.ArrowNotImplementedError)
+                errs = (TypeError, pa.lib.ArrowNotImplementedError)
+            except ImportError:
+                errs = TypeError
         else:
             errs = TypeError
         with pytest.raises(errs, match=f"({'|'.join(msgs)})"):
