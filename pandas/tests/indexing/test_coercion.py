@@ -754,7 +754,9 @@ class TestReplaceSeriesCoercion(CoercionBase):
     method = "replace"
 
     rep: dict[str, list] = {}
-    rep["object"] = ["a", "b"]
+    rep["object"] = [1, "b"]
+    rep["str"] = ["a", "b"]
+    rep["string"] = ["a", "b", None]
     rep["int64"] = [4, 5]
     rep["float64"] = [1.1, 2.2]
     rep["complex128"] = [1 + 1j, 2 + 2j]
@@ -834,6 +836,7 @@ class TestReplaceSeriesCoercion(CoercionBase):
     def test_replace_series(self, how, to_key, from_key, replacer):
         index = pd.Index([3, 4], name="xxx")
         obj = pd.Series(self.rep[from_key], index=index, name="yyy")
+        print(obj.dtype, from_key)
         assert obj.dtype == from_key
 
         if from_key.startswith("datetime") and to_key.startswith("datetime"):
@@ -877,18 +880,13 @@ class TestReplaceSeriesCoercion(CoercionBase):
     @pytest.mark.parametrize(
         "from_key", ["datetime64[ns, UTC]", "datetime64[ns, US/Eastern]"], indirect=True
     )
-    def test_replace_series_datetime_tz(
-        self, how, to_key, from_key, replacer, using_infer_string
-    ):
+    def test_replace_series_datetime_tz(self, how, to_key, from_key, replacer):
         index = pd.Index([3, 4], name="xyz")
         obj = pd.Series(self.rep[from_key], index=index, name="yyy")
         assert obj.dtype == from_key
 
         exp = pd.Series(self.rep[to_key], index=index, name="yyy")
-        if using_infer_string and to_key == "object":
-            assert exp.dtype == "string"
-        else:
-            assert exp.dtype == to_key
+        assert exp.dtype == to_key
 
         msg = "Downcasting behavior in `replace`"
         warn = FutureWarning if exp.dtype != object else None
